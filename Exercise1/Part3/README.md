@@ -55,7 +55,7 @@ When answering the questions, remember to use all the resources at your disposal
  ### How does pythons Global Interpreter Lock (GIL) influence the way a python Thread behaves?
  > The GIL is a mutex protecting access to Python objects since Python is not thread safe and thus
    the mutex stops different threads from accessing the same resources at the same time, thus
-   parallellism is not possible.
+   concurrency is not possible.
  
  ### With this in mind: What is the workaround for the GIL (Hint: it's another module)?
  > Using a multiprocess module.

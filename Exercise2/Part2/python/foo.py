@@ -7,16 +7,21 @@ from threading import Thread
 #   In Python you "import" a global variable, instead of "export"ing it when you declare it
 #   (This is probably an effort to make you feel bad about typing the word "global")
 i = 0
+threading lock = Lock()
 
 def incrementingFunction():
     global i
-    # TODO: increment i 1_000_000 times
+    for i in range 1000000:
+        lock.acquire()
+        i++
+        lock.release()
 
 def decrementingFunction():
     global i
-    # TODO: decrement i 1_000_000 times
-
-
+    for i in range 1000000:
+        lock.acquire()
+        i--
+        lock.release()
 
 def main():
     global i
