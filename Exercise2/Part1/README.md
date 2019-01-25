@@ -13,10 +13,10 @@
 > Same as a semaphore, but now with only one key. The moderator decides who gets the key next.
 
 ### What is the difference between a mutex and a binary semaphore?
-> A binary semaphore is used when there are only one shared resource. A mutex is a single key to the resource/resources.
+> A semaphore can increment and decrement whenever by an "admin" and the mutex can only be unlocked by the "owner" of the lock.
 
 ### What is a critical section?
-> A critical section is a section of resources that are protected from being accessed at the same time. Thus, threads are only able to use the resources one at a time.
+> A critical section is the section of code that should never be interrupted because that may lead to unexpected behaviour of data.
 
 ### What is the difference between race conditions and data races?
  > A race condition occurs when two or more threads can access shared data and they try to change it at

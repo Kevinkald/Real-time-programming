@@ -44,7 +44,7 @@ func incrementing(add_number chan<- int, finished chan<- bool) {
 }
 
 func decrementing(add_number chan<- int, finished chan<- bool) {
-	for j := 0; j<1000000; j++ {
+	for j := 0; j<1000001; j++ {
 		add_number <- -1
 	}
 	finished <- true
@@ -56,7 +56,7 @@ func main() {
 	// TODO: Construct the required channels
 	// Think about wether the receptions of the number should be unbuffered, or buffered with a fixed queue size.
 	add_number := make(chan int)
-	finished := make(chan bool, 2)
+	finished := make(chan bool,2)
 	control := make(chan int)
 	number := make(chan int)
 

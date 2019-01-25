@@ -1,26 +1,26 @@
 # Python 3.3.3 and 2.7.6
 # python fo.py
 
-from threading import Thread
+from threading import Thread, Lock
 
 # Potentially useful thing:
 #   In Python you "import" a global variable, instead of "export"ing it when you declare it
 #   (This is probably an effort to make you feel bad about typing the word "global")
 i = 0
-threading lock = Lock()
+lock = Lock()
 
 def incrementingFunction():
     global i
-    for i in range 1000000:
+    for j in range (1000000):
         lock.acquire()
-        i++
+        i = i + 1
         lock.release()
 
 def decrementingFunction():
     global i
-    for i in range 1000000:
+    for j in range (1000000):
         lock.acquire()
-        i--
+        i = i - 1
         lock.release()
 
 def main():
@@ -29,7 +29,8 @@ def main():
     incrementing = Thread(target = incrementingFunction, args = (),)
     decrementing = Thread(target = decrementingFunction, args = (),)
     
-    # TODO: Start both threads
+    incrementing.start()
+    decrementing.start()
     
     incrementing.join()
     decrementing.join()
