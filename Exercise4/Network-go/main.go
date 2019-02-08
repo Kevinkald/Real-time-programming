@@ -61,7 +61,7 @@ func main() {
 		for {
 			helloMsg.Iter++
 			helloTx <- helloMsg
-			time.Sleep(1 * time.Second)
+			time.Sleep(1000 * time.Millisecond)
 		}
 	}()
 

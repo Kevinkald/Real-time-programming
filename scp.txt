@@ -1,0 +1,11 @@
+
+
+Copying folder ttk4145 from remote computer @ the given ip to our computer at Real-time..
+Run at our computer.
+
+sudo scp -r student@10.100.23.176:~/ttk4145 ~/Real-time-programming
+
+
+
+Copy from host to remote at given ip.
+sudo scp -r ~/Real-time-programming/Exercise1 student@10.100.23.176:~/ttk4145
