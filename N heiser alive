@@ -1,0 +1,37 @@
+N heiser alive
+
+
+Cases:
+
+
+	1. Button press
+
+		->Button module register order
+		->Send order over channel to queueDistributor module
+		->Distribute order = update queue for chosen elevator
+		->Broadcast updated queue to network module, adding bool:add=true
+		   ->When received by other nodes, union on queues.
+		->if all queues equal, set light
+
+
+	2. Package loss
+
+		->Broadcasting contionously should remove this problem
+
+
+
+	3. Network loss
+
+		
+
+	4. Power loss
+
+
+
+Modules:
+
+	- Network
+	- FSM
+	- Buttons
+	- orderDistributor
+	- 
