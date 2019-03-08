@@ -30,7 +30,7 @@ func main(){
 
 	//Sleep to make sure that no numbers are skipped
 	//in transition from secondary->primary
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(1000 * time.Millisecond)
 
 	//Secondary loop
 	for (!primary){
@@ -68,7 +68,7 @@ func main(){
 		fmt.Println("Sent msg to secondary: ",counter)
 
 		//Sleep to avoid DDOS of server..
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 	broadcast_conn.Close()
 }

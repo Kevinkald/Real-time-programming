@@ -1,0 +1,21 @@
+
+Priority:
+
+1. FSM -> golang							Lars							
+
+2. Queue distribution						Kaja
+	-cost function(already implemented)	
+	-handle queues
+	-Compares/unions/removes
+
+3. Network -> tweak							Kevin			
+	- Alive logic	
+4. Buttons
+
+--------------------------------------
+
+Sidejob
+
+5. Simulator(together with FS??)
+6. Lage config fil
+7. lage datatypes
