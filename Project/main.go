@@ -1,6 +1,7 @@
 package main
 import(
 	//"fmt"
+	"runtime"
 	//"./config"
 
 	//"./buttons"
@@ -8,8 +9,13 @@ import(
 )
 
 func main(){
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	//go buttons.Buttons()
 	go network.Network()
+
+	
+
+
 	for {
 
 	}
