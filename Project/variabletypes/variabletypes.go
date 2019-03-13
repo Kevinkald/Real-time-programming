@@ -1,5 +1,10 @@
 package variabletypes
 
+import(
+	"../config"
+
+)
+
 type MotorDirection int
 
 const (
@@ -35,11 +40,14 @@ type PeerUpdate struct {
 	Lost  []string
 }
 
-type Elevator struct {
+type ElevatorObject struct {
 	Floor int
+	Dirn MotorDirection
 }
 
-type Msg struct {
-	//elev Elevator
-	Messsage string
+type OrderMatrix [config.M_FLOORS][config.N_ELEVATORS+2]bool
+
+type NetworkMessage struct {
+	Elevator [config.N_ELEVATORS]ElevatorObject
+	Orders OrderMatrix
 }

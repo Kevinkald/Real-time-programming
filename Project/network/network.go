@@ -2,72 +2,58 @@ package network
 
 import (
 	"./bcast"
-	"./localip"
+	//"./localip"
 	"./peers"
 	"../variabletypes"
-	"flag"
-	"fmt"
-	"os"
-	"time"
+	//"flag"
+	//"fmt"
+	//"os"
+	//"time"
+	//"strings"
+	"../config"
 )
 
-func Network() {
+func Network(	peerUpdateCh chan<- variabletypes.PeerUpdate, 
+				NetworkMessageCh chan<-  variabletypes.NetworkMessage,
+				NetworkMessageBroadcastCh <-chan  variabletypes.NetworkMessage) {
+
+	// We can disable/enable the transmitter after it has been started.
+	// This could be used to signal that we are somehow "unavailable".
+	peerTxEnable := make(chan bool)
+	go peers.Transmitter(15647, config.ELEVATOR_ID, peerTxEnable)
+	go peers.Receiver(15647, peerUpdateCh)
+
+	// We make channels for sending and receiving our custom data types
+	//broadcastTx := make(chan variabletypes.NetworkMessage)
+	//broadcastRx := make(chan variabletypes.NetworkMessage)
+	// ... and start the transmitter/receiver pair on some port
+	// These functions can take any number of channels! It is also possible to
+	//  start multiple transmitters/receivers on the same port.
+	go bcast.Transmitter(16569, NetworkMessageBroadcastCh)
+	go bcast.Receiver(16569, NetworkMessageCh)
+}
+
+	/*go func() {
+		Msg := variabletypes.NetworkMessage{}
+		for {
+			msgTx <- Msg
+			time.Sleep(1 * time.Second)
+		}
+	}()*/
+
+	//
+
 	// Our id can be anything. Here we pass it on the command line, using
 	//  `go run main.go -id=our_id`
-	var id string
-	flag.StringVar(&id, "id", "", "id of this peer")
-	flag.Parse()
 
 	// ... or alternatively, we can use the local IP address.
 	// (But since we can run multiple programs on the same PC, we also append the
 	//  process ID)
-	if id == "" {
+	/*if id == "" {
 		localIP, err := localip.LocalIP()
 		if err != nil {
 			fmt.Println(err)
 			localIP = "DISCONNECTED"
 		}
-		id = fmt.Sprintf("peer-%s-%d", localIP, os.Getpid())
-	}
-
-	// We make a channel for receiving updates on the id's of the peers that are
-	//  alive on the network
-	peerUpdateCh := make(chan variabletypes.PeerUpdate)
-	// We can disable/enable the transmitter after it has been started.
-	// This could be used to signal that we are somehow "unavailable".
-	peerTxEnable := make(chan bool)
-	go peers.Transmitter(15647, id, peerTxEnable)
-	go peers.Receiver(15647, peerUpdateCh)
-
-	// We make channels for sending and receiving our custom data types
-	helloTx := make(chan variabletypes.Msg)
-	helloRx := make(chan variabletypes.Msg)
-	// ... and start the transmitter/receiver pair on some port
-	// These functions can take any number of channels! It is also possible to
-	//  start multiple transmitters/receivers on the same port.
-	go bcast.Transmitter(16569, helloTx)
-	go bcast.Receiver(16569, helloRx)
-
-	// The example message. We just send one of these every second.
-	go func() {
-		Msg := variabletypes.Msg{"hello"}
-		for {
-			helloTx <- Msg
-			time.Sleep(1 * time.Second)
-		}
-	}()
-
-	fmt.Println("Started")
-	for {
-		select {
-		case p := <-peerUpdateCh:
-			fmt.Printf("Peer update:\n")
-			fmt.Printf("  Peers:    %q\n", p.Peers)
-			fmt.Printf("  New:      %q\n", p.New)
-			fmt.Printf("  Lost:     %q\n", p.Lost)
-
-		case a := <-helloRx:
-			fmt.Printf("Received: %#v\n", a)
-		}
-	}
-}
+		config.ELEVATOR_ID = fmt.Sprintf("peer-%s-%d", localIP, os.Getpid())
+	}*/
