@@ -47,7 +47,9 @@ type ElevatorObject struct {
 
 type OrderMatrix [config.M_FLOORS][config.N_ELEVATORS+2]bool
 
+type ElevatorMap map[string]ElevatorObject
+
 type NetworkMessage struct {
-	Elevator [config.N_ELEVATORS]ElevatorObject
+	Elevators ElevatorMap
 	Orders OrderMatrix
 }
