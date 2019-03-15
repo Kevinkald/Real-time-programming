@@ -3,45 +3,33 @@ import(
 	"fmt"
 	"runtime"
 	"./variabletypes"
-	"time"
+	//"time"
 	//"./buttons"
 	"./network"
-	"./config"
+	//"./config"
+	"./queuedistribution"
+	//"./fsm/elevio"
 )
 
 func main(){
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	//Channels between Queuedistributor and network module
+	//Channels between Queuedistributor and Network module
 	peerUpdateCh := make(chan variabletypes.PeerUpdate)
-	networkMessageCh := make(chan variabletypes.NetworkMessage)
-	networkMessageBroadcastCh := make(chan variabletypes.NetworkMessage)
+	networkMessageCh := make(chan variabletypes.AllElevatorInfo)
+	networkMessageBroadcastCh := make(chan variabletypes.AllElevatorInfo)
+
+	//Channel between FSM and Queuedistributor module
+	//Insert here
+
+	//Channel between Buttons and Queuedistributor module
+	//buttonsCh := make(chan variabletypes.ButtonEvent)
 
 	go network.Network(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
 
-	go func(){
-		elevator1 := variabletypes.ElevatorObject{4,-1}
-		elevator2 := variabletypes.ElevatorObject{3, 1}
-		orders := variabletypes.OrderMatrix{}
-		for i:= 0; i<config.M_FLOORS; i++{
-			for j:= 0; j<config.N_ELEVATORS; j++{
-				orders[i][j] = false
-			}
-		}
+	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
 
-		elevators := variabletypes.Elevatrs{}
-
-		elevators["1"] = {variabletypes.Floor: 4,variabletypes.Dirn: -1}
-		elevators["2"] = {3, 1}
-
-		msg := variabletypes.NetworkMessage{Elevators: elevators ,Orders: orders}
-
-		//Keep sending message over to "queuedistributor"
-		for {
-			networkMessageCh<- msg
-			time.Sleep(1 * time.Second)
-		}
-	}()
+	//go elevio.PollButtons(buttonsCh)
 
 	for {
 		select {

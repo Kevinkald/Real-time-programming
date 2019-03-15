@@ -2,7 +2,11 @@ package config
 
 const (
 
-	ELEVATOR_ID string = "1"
-	M_FLOORS int = 4
-	N_ELEVATORS int = 2
+	ElevatorId string = "1"
+	M_Floors int = 4
+	K_Buttons int = 3
+	N_Elevators int = 2
+
+	PeerPort int = 20012
+	BroadcastPort int = 30012
 )

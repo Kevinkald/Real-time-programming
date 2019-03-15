@@ -30,10 +30,6 @@ type ButtonPress struct {
 	floor int
 }
 
-type ImAliveMsg struct {
-
-}
-
 type PeerUpdate struct {
 	Peers []string
 	New   string
@@ -45,11 +41,11 @@ type ElevatorObject struct {
 	Dirn MotorDirection
 }
 
-type OrderMatrix [config.M_FLOORS][config.N_ELEVATORS+2]bool
+type SingleOrderMatrix [config.M_Floors][config.K_Buttons]bool
 
-type ElevatorMap map[string]ElevatorObject
-
-type NetworkMessage struct {
-	Elevators ElevatorMap
-	Orders OrderMatrix
+type SingleElevatorInfo struct {
+	OrderMatrix SingleOrderMatrix
+	State ElevatorObject
 }
+
+type AllElevatorInfo map[string]SingleElevatorInfo
