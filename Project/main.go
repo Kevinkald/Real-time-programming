@@ -1,6 +1,6 @@
 package main
 import(
-	"fmt"
+	//"fmt"
 	"runtime"
 	"./variabletypes"
 	//"time"
@@ -8,7 +8,8 @@ import(
 	"./network"
 	//"./config"
 	"./queuedistribution"
-	//"./fsm/elevio"
+	"./fsm/elevio"
+	"./fsm/fsmdummy"
 )
 
 func main(){
@@ -23,21 +24,15 @@ func main(){
 	//Insert here
 
 	//Channel between Buttons and Queuedistributor module
-	//buttonsCh := make(chan variabletypes.ButtonEvent)
+	buttonsCh := make(chan variabletypes.ButtonEvent)
 
 	go network.Network(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
 
-	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
+	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh)
 
-	//go elevio.PollButtons(buttonsCh)
+	go elevio.PollButtons(buttonsCh)
 
-	for {
-		select {
-		case k := <-peerUpdateCh:
-			fmt.Println(k.Peers)
+	go fsmdummy.FsmDummy()
 
-		case m := <-networkMessageCh:
-			fmt.Println(m)
-		}
-	}
+	for{}
 }
