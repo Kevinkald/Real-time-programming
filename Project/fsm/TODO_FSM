@@ -1,0 +1,7 @@
+TODO for FSM:
+
+- Decide how/when floor/direction is sent to order module
+- Finish eventArrivedAtFloor
+- Clean up variable types
+- Implement order logic
+- Decide on floor sensor polling and floor lights
