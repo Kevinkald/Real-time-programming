@@ -13,5 +13,5 @@ const (
 	PeerPort int = 20012
 	BroadcastPort int = 30012
 	SimulatorPort string = "localhost:16001"
-	HardWarePort string = "Not known"
+	HardwarePort string = "localhost:15657"
 )

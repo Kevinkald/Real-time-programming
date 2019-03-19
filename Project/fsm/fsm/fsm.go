@@ -3,8 +3,7 @@ package fsm
 import(
 	"fmt"
 	"time"
-	"elevio"
-	"orderLogic"
+	"../elevio"
 	"../../config"
 	"../../variableTypes"
 )
