@@ -1,8 +1,8 @@
-package orderLogic
+package fsm
 
 import (
-	. "elevio"
-	. "fmt"
+	"../elevio"
+	"fmt"
 	"../../config"
 	"../../variableTypes"
 )
@@ -25,6 +25,18 @@ func ordersBelow(elevator variableTypes.ElevatorObject, orders variableTypes.Sin
 	return false
 }
 
-func chooseNextDirection(singleElevator variableTypes.ElevatorObject, singleElevatorOrders variableTypes.SingleOrderMatrix) {
+func ChooseNextDirection(singleElevator variableTypes.ElevatorObject, singleElevatorOrders variableTypes.SingleOrderMatrix) {
+	switch singleElevator.Dirn {
+	case variableTypes.MD_UP:
+		return (!ordersBelow(singleElevator, singleElevatorOrders) || singleELevatorOrders[singleElevator.Floor][]
+	case variableTypes.MD_DOWN:
 
+	case variableTypes.MD_STOP:
+
+
+	}
+}
+
+func CheckForStop(singleElevator variableTypes.ElevatorObject, singleElevatorOrders variableTypes.SingleOrderMatrix) {
+	
 }
