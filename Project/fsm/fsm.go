@@ -1,8 +1,8 @@
 package fsm
 
 import(
-	."fmt"
-	."time"
+	"fmt"
+	"time"
 	"elevio"
 	"orderLogic"
 	"../../config"
@@ -23,7 +23,7 @@ var singleElevatorOrders variableTypes.SingleOrderMatrix
 
 func Fsm(
 	ordersCh <-chan variableTypes.SingleOrderMatrix,
-	elevatorObjectCh <-chan variableTypes.ElevatorObject,
+	elevatorObjectCh chan<- variableTypes.ElevatorObject,
 	removeOrderCh <-chan int,
 	reachedFloorCh <-chan int
 	) {
@@ -38,31 +38,36 @@ func Fsm(
 	for {
 		select {
 		case <- doorTimer.C:
-			eventDoorTimeOut()
+			fsmDoorTimeOut()
 
 		case <- elevatorStuckTimer.C:
-			eventElevatorStuckTimeOut()
+			fsmElevatorStuckTimeOut()
 
 		case SingleElevatorOrders := <-ordersCh:
-			eventNewOrder()
+			fsmNewOrder()
 
 		case SingleElevator.Floor := <-reachedFloorCh:
-			eventNewFloor()
+			fsmReachedFloor()
 		}
 	}
 }
 
-func eventArrivedAtFloor(){
+func fsmReachedFloor(){
+	elevatorStuckTimer.Stop()
 	switch state {
 	case MOVING:
-		elevatorStuckTimer.Stop()
 		if orderLogic.CheckForStop(singleElevator, singleElevatorOrders) {
-
+			elevio.SetMotorDirection(variableTypes.MD_Stop)
+			elevio.SetDoorOpenLamp(true)
+			doorTimer.Reset()
+			state = OPEN
+		} else {
+			elevatorStuckTimer.start()
 		}
 	}
 }
 
-func eventDoorTimeOut(removeOrderCh <-chan int){
+func fsmDoorTimeOut(removeOrderCh <-chan int){
 	switch state {
 	case OPEN:
 		elevio.SetDoorOpenLamp(false)
@@ -79,6 +84,11 @@ func eventDoorTimeOut(removeOrderCh <-chan int){
 	}
 }
 
-func eventElevatorStuckTimeOut(){
-
+func fsmElevatorStuckTimeOut(){
+	fmt.Println("****************   ELEVATOR ENGINE ERROR!   ****************")
+	fmt.Println("****************   RESTART ELEVATOR %d      ****************", config.ElevatorId)
+	elevio.SetMotorDirection(variableTypes.MD_Stop)
+	time.Sleep(time.Second * 1)
+	//os.Exit(1)
+	// Automatic restart? Other handling? how when what huh... todo
 }

@@ -62,10 +62,10 @@ func SetStopLamp(value bool) {
 }
 
 func PollButtons(receiver chan<- variabletypes.ButtonEvent) {
-	prev := make([][3]bool, config.M_Floors)
+	prev := make([][3]bool, config.N_Floors)
 	for {
 		time.Sleep(_pollRate)
-		for f := 0; f < config.M_Floors; f++ {
+		for f := 0; f < config.N_Floors; f++ {
 			for b := variabletypes.ButtonType(0); b < 3; b++ {
 				v := getButton(b, f)
 				if v != prev[f][b] && v != false {

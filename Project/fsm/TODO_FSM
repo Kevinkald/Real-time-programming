@@ -5,3 +5,5 @@ TODO for FSM:
 - Clean up variable types
 - Implement order logic
 - Decide on floor sensor polling and floor lights
+- Discuss elevator stuck routine
+	- The elevator software should not require reinitialization (manual restart) after intermittent network or motor power loss

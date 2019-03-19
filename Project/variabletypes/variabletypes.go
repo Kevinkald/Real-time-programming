@@ -41,7 +41,7 @@ type ElevatorObject struct {
 	Dirn MotorDirection
 }
 
-type SingleOrderMatrix [config.M_Floors][config.K_Buttons]bool
+type SingleOrderMatrix [config.N_Floors][config.N_Buttons]bool
 
 type SingleElevatorInfo struct {
 	OrderMatrix SingleOrderMatrix

@@ -32,7 +32,7 @@ func FsmDummy(){
           */  
         case a := <- drv_floors:
             fmt.Printf("Current floor: %+v\n", a)
-            if a == config.M_Floors-1 {
+            if a == config.N_Floors-1 {
                 d = variabletypes.MD_Down
             } else if a == 0 {
                 d = variabletypes.MD_Up
@@ -50,7 +50,7 @@ func FsmDummy(){
             
         case a := <- drv_stop:
             fmt.Printf("%+v\n", a)
-            for f := 0; f < config.M_Floors; f++ {
+            for f := 0; f < config.N_Floors; f++ {
                 for b := variabletypes.ButtonType(0); b < 3; b++ {
                     elevio.SetButtonLamp(b, f, false)
                 }
