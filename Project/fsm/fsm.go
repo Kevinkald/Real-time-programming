@@ -53,6 +53,7 @@ func Fsm(ordersCh <-chan variabletypes.SingleOrderMatrix, elevatorObjectCh chan<
 }
 
 func fsmNewOrder(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- bool) {
+	fmt.Println("New order received!")
 	switch state {
 	case variabletypes.IDLE:
 		if orderlogic.CheckForStop(singleElevator, singleElevatorOrders) {
@@ -87,8 +88,8 @@ func fsmDoorTimeOut(removeOrderCh chan<- variabletypes.ElevatorObject, elevatorS
 	switch state {
 	case variabletypes.OPEN:
 		fmt.Println("Closing doors")
-		elevio.SetDoorOpenLamp(false)
 		removeOrderCh <- singleElevator
+		elevio.SetDoorOpenLamp(false)
 		singleElevator.Dirn = orderlogic.ChooseNextDirection(singleElevator, singleElevatorOrders)
 		if singleElevator.Dirn == variabletypes.MD_Stop {
 			state = variabletypes.IDLE

@@ -53,6 +53,7 @@ func main(){
 				orders[msg.Floor][f] = false
 			}
 			ordersCh <- orders
+			fmt.Println("Order removed")
 		}
 	}
 }
