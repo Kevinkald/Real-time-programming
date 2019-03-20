@@ -22,7 +22,7 @@ func main(){
 
 	//Channel between FSM and Queuedistributor module
 	//Insert here
-
+	
 	//Channel between Buttons and Queuedistributor module
 	buttonsCh := make(chan variabletypes.ButtonEvent)
 

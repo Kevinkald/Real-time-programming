@@ -21,6 +21,14 @@ const (
 	BT_Cab                 = 2
 )
 
+type ElevatorState int
+
+const (
+	IDLE ElevatorState = iota
+	OPEN
+	MOVING
+)
+
 type ButtonEvent struct {
 	Floor  int
 	Button ButtonType
@@ -39,13 +47,14 @@ type PeerUpdate struct {
 type ElevatorObject struct {
 	Floor int
 	Dirn MotorDirection
+	State ElevatorState
 }
 
 type SingleOrderMatrix [config.M_Floors][config.K_Buttons]bool
 
 type SingleElevatorInfo struct {
 	OrderMatrix SingleOrderMatrix
-	State ElevatorObject
+	ElevObj ElevatorObject
 }
 
 type AllElevatorInfo map[string]SingleElevatorInfo

@@ -7,11 +7,11 @@ import(
 	"../variabletypes"
 	"./utilities"
 	"../fsm/elevio"
-	"../costfunction"
+	//"../costfunction"
 )
 
 const (
-	invalidIP   = config.ElevatorId("")
+	invalidIP string  = ""
 )
 
 func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
@@ -45,7 +45,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 }
 
 
-func DelegateOrder(elevMap variabletypes.AllElevatorInfo, button variabletypes.ButtonType, floor int) ElevatorId {
+/*func DelegateOrder(elevMap variabletypes.AllElevatorInfo, button variabletypes.ButtonType, floor int) ElevatorId {
 	AllElevMap := utilities.CreateMapCopy(elevMap)
 	currentIP := invalidIP
 	currentDuration := 0
@@ -65,7 +65,7 @@ func DelegateOrder(elevMap variabletypes.AllElevatorInfo, button variabletypes.B
 
 	return currentIP
 }
-
+*/
 
 //if DelegateOrder = invalidIP 
 //error
