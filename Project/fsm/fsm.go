@@ -13,8 +13,9 @@ var state variabletypes.ElevatorState
 var singleElevator variabletypes.ElevatorObject
 var singleElevatorOrders variabletypes.SingleOrderMatrix 
 
-func Fsm(ordersCh <-chan variabletypes.SingleOrderMatrix, elevatorObjectCh chan<- variabletypes.ElevatorObject, removeOrderCh chan<- int) {
-
+func Fsm(ordersCh <-chan variabletypes.SingleOrderMatrix, elevatorObjectCh chan<- variabletypes.ElevatorObject, removeOrderCh chan<- variabletypes.ElevatorObject) {
+	elevio.Init(config.HardwarePort)
+	fmt.Println("Elevator initiated")
 	state = variabletypes.IDLE
 	//singleElevator.Floor := elevio.getFloor()
 	elevatorStuckTimerResetCh := make(chan bool)
@@ -29,6 +30,8 @@ func Fsm(ordersCh <-chan variabletypes.SingleOrderMatrix, elevatorObjectCh chan<
 	go fsmElevatorStuckTimer(elevatorStuckTimerResetCh, elevatorStuckTimerStopCh, elevatorStuckTimerOutCh)
 	go fsmDoorTimer(doorTimerResetCh, doorTimerOutCh)
 	go elevio.PollFloorSensor(reachedFloorCh)
+
+	fmt.Println("Goroutines up and running")
 
 	for {
 		select {
@@ -80,14 +83,16 @@ func fsmReachedFloor(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh cha
 	}
 }
 
-func fsmDoorTimeOut(removeOrderCh chan<- int, elevatorStuckTimerResetCh chan<- bool){
+func fsmDoorTimeOut(removeOrderCh chan<- variabletypes.ElevatorObject, elevatorStuckTimerResetCh chan<- bool){
 	switch state {
 	case variabletypes.OPEN:
+		fmt.Println("Closing doors")
 		elevio.SetDoorOpenLamp(false)
-		removeOrderCh <- singleElevator.Floor
+		removeOrderCh <- singleElevator
 		singleElevator.Dirn = orderlogic.ChooseNextDirection(singleElevator, singleElevatorOrders)
 		if singleElevator.Dirn == variabletypes.MD_Stop {
 			state = variabletypes.IDLE
+			fmt.Println("Elevator in IDLE")
 			// elevatorStuckTimer.stop()
 		} else {
 			elevio.SetMotorDirection(singleElevator.Dirn)

@@ -1,14 +1,14 @@
 package main
 import(
-	//"fmt"
+	"fmt"
 	"runtime"
 	"./variabletypes"
 	//"time"
 	//"./buttons"
 	//"./network"
-	//"./config"
+	"./config"
 	//"./queuedistribution"
-	//"./fsm/elevio"
+	"./fsm/elevio"
 	//"./fsm/fsmdummy"
 	"./fsm"
 )
@@ -25,10 +25,10 @@ func main(){
 	//Insert here
 	ordersCh := make(chan variabletypes.SingleOrderMatrix)
 	elevatorObjectCh := make(chan variabletypes.ElevatorObject)
-	removeOrderCh := make(chan int)  // variabletypes.ButtonEvent!!!!!!!!!!!!!!!!!!!!!!!
+	removeOrderCh := make(chan variabletypes.ElevatorObject)  // variabletypes.ButtonEvent!!!!!!!!!!!!!!!!!!!!!!!
 
 	//Channel between Buttons and Queuedistributor module
-	//buttonsCh := make(chan variabletypes.ButtonEvent)
+	buttonsCh := make(chan variabletypes.ButtonEvent)
 	//reachedFloorCh := make(chan int)						// NB! implement!?
 
 	//go network.Network(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
@@ -38,6 +38,21 @@ func main(){
 	//go elevio.PollButtons(buttonsCh)
 
 	go fsm.Fsm(ordersCh, elevatorObjectCh, removeOrderCh)
+	go elevio.PollButtons(buttonsCh)
 
-	for{}
+	var orders variabletypes.SingleOrderMatrix 
+	fmt.Println("Here in main")
+	for{
+		select{
+		case msg := <-buttonsCh:
+			orders[msg.Floor][msg.Button] = true
+			ordersCh <- orders
+			fmt.Println("New order")
+		case msg := <-removeOrderCh:
+			for f := 0; f < config.N_Buttons; f++ {
+				orders[msg.Floor][f] = false
+			}
+			ordersCh <- orders
+		}
+	}
 }
