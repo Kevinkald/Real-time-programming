@@ -12,7 +12,8 @@ import(
 func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 							networkMessageCh <-chan variabletypes.AllElevatorInfo,
 							NetworkMessageBroadcastCh chan<-  variabletypes.AllElevatorInfo,
-							ButtonsCh <-chan variabletypes.ButtonEvent) {
+							ButtonsCh <-chan variabletypes.ButtonEvent,
+							removeOrderCh <-chan variabletypes.ButtonEvent) {
 
 
 	elevMap := make(map[string]variabletypes.SingleElevatorInfo)
@@ -35,6 +36,19 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		case n := <-networkMessageCh:
 		//Receive the maps from broadcast, do stuff with it here
 		fmt.Println(n)
+		
+		case r := <-removeOrderCh:
+			var val = 1
+			//Remove order if cab call, else set element to -1 to indicate removal
+			if (r.Button == variabletypes.BT_Cab){
+				val = 0
+			}
+			else{
+				val = -1
+			}
+			var tmp = elevMap[config.ElevatorId]
+			tmp.OrderMatrix[r.Floor][r.Button] = val
+			elevMap[config.ElevatorId] = tmp
 		}
 	}
 }

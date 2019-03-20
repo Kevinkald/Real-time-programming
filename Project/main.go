@@ -21,14 +21,14 @@ func main(){
 	networkMessageBroadcastCh := make(chan variabletypes.AllElevatorInfo)
 
 	//Channel between FSM and Queuedistributor module
-	//Insert here
+	removeOrderCh := make(chan variabletypes.ButtonEvent)
 	
 	//Channel between Buttons and Queuedistributor module
 	buttonsCh := make(chan variabletypes.ButtonEvent)
 
 	go network.Network(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
 
-	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh)
+	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh,removeOrderCh)
 
 	go elevio.PollButtons(buttonsCh)
 
