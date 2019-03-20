@@ -34,5 +34,5 @@ func main(){
 
 	go fsmdummy.FsmDummy()
 
-	for{}
+	select{}
 }
