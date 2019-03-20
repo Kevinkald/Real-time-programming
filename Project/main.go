@@ -2,7 +2,7 @@ package main
 import(
 	//"fmt"
 	"runtime"
-	//"./variabletypes"
+	"./variabletypes"
 	//"time"
 	//"./buttons"
 	//"./network"
@@ -23,9 +23,9 @@ func main(){
 
 	//Channel between FSM and Queuedistributor module
 	//Insert here
-	ordersCh := make(chan variableTypes.SingleOrderMatrix)
-	elevatorObjectCh := make(chan variableTypes.ElevatorObject)
-	removeOrderCh := make(chan variabletypes.ButtonEvent)
+	ordersCh := make(chan variabletypes.SingleOrderMatrix)
+	elevatorObjectCh := make(chan variabletypes.ElevatorObject)
+	removeOrderCh := make(chan int)  // variabletypes.ButtonEvent!!!!!!!!!!!!!!!!!!!!!!!
 
 	//Channel between Buttons and Queuedistributor module
 	//buttonsCh := make(chan variabletypes.ButtonEvent)

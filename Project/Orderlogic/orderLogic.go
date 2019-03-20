@@ -27,7 +27,7 @@ func ordersBelow(elevator variabletypes.ElevatorObject, orders variabletypes.Sin
 	return false
 }
 
-func ChooseNextDirection(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix) variabletypes.MotorDirection {
+func ChooseNextDirection(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)variabletypes.MotorDirection{
 	switch elevator.Dirn {
 	case variabletypes.MD_Up:
 		if ordersAbove(elevator, orders) {
