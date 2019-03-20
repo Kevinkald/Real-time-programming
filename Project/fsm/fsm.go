@@ -9,21 +9,13 @@ import(
 	"../variabletypes"
 )
 
-type elevatorState int
-
-const (
-	IDLE elevatorState = iota
-	OPEN
-	MOVING
-)
-
-var state elevatorState
+var state variabletypes.ElevatorState
 var singleElevator variabletypes.ElevatorObject
 var singleElevatorOrders variabletypes.SingleOrderMatrix 
 
 func Fsm(ordersCh <-chan variabletypes.SingleOrderMatrix, elevatorObjectCh chan<- variabletypes.ElevatorObject, removeOrderCh chan<- int) {
 
-	state = IDLE
+	state = variabletypes.IDLE
 	//singleElevator.Floor := elevio.getFloor()
 	elevatorStuckTimerResetCh := make(chan bool)
 	elevatorStuckTimerStopCh := make(chan bool)
@@ -59,16 +51,16 @@ func Fsm(ordersCh <-chan variabletypes.SingleOrderMatrix, elevatorObjectCh chan<
 
 func fsmNewOrder(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- bool) {
 	switch state {
-	case IDLE:
+	case variabletypes.IDLE:
 		if orderlogic.CheckForStop(singleElevator, singleElevatorOrders) {
 			elevio.SetDoorOpenLamp(true)
 			doorTimerResetCh <- true
-			state = OPEN
+			state = variabletypes.OPEN
 		} else {
 			singleElevator.Dirn = orderlogic.ChooseNextDirection(singleElevator, singleElevatorOrders)
 			elevio.SetMotorDirection(singleElevator.Dirn)
 			elevatorStuckTimerResetCh <- true
-			state = MOVING
+			state = variabletypes.MOVING
 		}
 	}
 }
@@ -76,12 +68,12 @@ func fsmNewOrder(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- 
 func fsmReachedFloor(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- bool, elevatorStuckTimerStopCh chan<- bool){
 	elevatorStuckTimerStopCh <- true
 	switch state {
-	case MOVING:
+	case variabletypes.MOVING:
 		if orderlogic.CheckForStop(singleElevator, singleElevatorOrders) {
 			elevio.SetMotorDirection(variabletypes.MD_Stop)
 			elevio.SetDoorOpenLamp(true)
 			doorTimerResetCh <- true
-			state = OPEN
+			state = variabletypes.OPEN
 		} else {
 			elevatorStuckTimerResetCh <- true
 		}
@@ -90,17 +82,17 @@ func fsmReachedFloor(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh cha
 
 func fsmDoorTimeOut(removeOrderCh chan<- int, elevatorStuckTimerResetCh chan<- bool){
 	switch state {
-	case OPEN:
+	case variabletypes.OPEN:
 		elevio.SetDoorOpenLamp(false)
 		removeOrderCh <- singleElevator.Floor
 		singleElevator.Dirn = orderlogic.ChooseNextDirection(singleElevator, singleElevatorOrders)
 		if singleElevator.Dirn == variabletypes.MD_Stop {
-			state = IDLE
+			state = variabletypes.IDLE
 			// elevatorStuckTimer.stop()
 		} else {
 			elevio.SetMotorDirection(singleElevator.Dirn)
 			elevatorStuckTimerResetCh <- true
-			state = MOVING
+			state = variabletypes.MOVING
 		}
 	}
 }

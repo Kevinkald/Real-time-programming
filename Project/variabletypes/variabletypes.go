@@ -21,6 +21,14 @@ const (
 	BT_Cab                 = 2
 )
 
+type ElevatorState int
+
+const (
+	IDLE ElevatorState = iota
+	OPEN
+	MOVING
+)
+
 type ButtonEvent struct {
 	Floor  int
 	Button ButtonType
