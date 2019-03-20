@@ -10,7 +10,7 @@ import(
 	//"./queuedistribution"
 	//"./fsm/elevio"
 	//"./fsm/fsmdummy"
-	"./fsm/fsm"
+	"./fsm"
 )
 
 func main(){
@@ -25,11 +25,11 @@ func main(){
 	//Insert here
 	ordersCh := make(chan variableTypes.SingleOrderMatrix)
 	elevatorObjectCh := make(chan variableTypes.ElevatorObject)
-	removeOrderCh := make(chan int)
+	removeOrderCh := make(chan variabletypes.ButtonEvent)
 
 	//Channel between Buttons and Queuedistributor module
 	//buttonsCh := make(chan variabletypes.ButtonEvent)
-	reachedFloorCh := make(chan int)						// NB! implement!?
+	//reachedFloorCh := make(chan int)						// NB! implement!?
 
 	//go network.Network(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
 
@@ -37,7 +37,7 @@ func main(){
 
 	//go elevio.PollButtons(buttonsCh)
 
-	go fsm.Fsm(ordersCh, elevatorObjectCh, removeOrderCh, reachedFloorCh)
+	go fsm.Fsm(ordersCh, elevatorObjectCh, removeOrderCh)
 
 	for{}
 }
