@@ -2,11 +2,12 @@ package queuedistribution
 
 import(
 	"fmt"
-	//"time"
+	"time"
 	"../config"
 	"../variabletypes"
 	"./utilities"
 	"../fsm/elevio"
+	"./synchronizationlogic"
 )
 
 func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
@@ -16,8 +17,13 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 							removeOrderCh <-chan variabletypes.ButtonEvent) {
 
 
-	elevMap := make(map[string]variabletypes.SingleElevatorInfo)
-	elevMap[config.ElevatorId] = variabletypes.SingleElevatorInfo{}
+	elevMap := utilities.InitMap()
+
+	//Just to check if elev obj syncs up
+	var tmp = elevMap[config.ElevatorId]
+	tmp.ElevObj.State = 2
+	elevMap[config.ElevatorId] = tmp
+
 
 	//Send initialized elevMap to broadcasting
 	//Important to copy the dynamic map before sending over channel
@@ -30,25 +36,31 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			fmt.Println("Current alive nodes:",p.Peers)
 
 		case b:= <-ButtonsCh:
-		fmt.Println("Pushed button: {floor,type} ", b)
-		elevio.SetButtonLamp(b.Button, b.Floor, true)
+			fmt.Println("Pushed button: {floor,type} ", b)
+			var tmp = elevMap[config.ElevatorId]
+			tmp.OrderMatrix[b.Floor][b.Button] = true
+			elevMap[config.ElevatorId] = tmp
+			elevio.SetButtonLamp(b.Button, b.Floor, true)
+			//Broadcast changes
+			msg := utilities.CreateMapCopy(elevMap)
+			NetworkMessageBroadcastCh<- msg
 
 		case n := <-networkMessageCh:
-		//Receive the maps from broadcast, do stuff with it here
-		fmt.Println(n)
+			//fmt.Println(n)
+			elevMap = synchronizationlogic.Synchronize(elevMap,n)
+			//Broadcast changes
+			msg := utilities.CreateMapCopy(elevMap)
+			NetworkMessageBroadcastCh<- msg
+			time.Sleep(1*time.Millisecond)
+			utilities.PrintMap(elevMap)
 		
 		case r := <-removeOrderCh:
-			var val = 1
-			//Remove order if cab call, else set element to -1 to indicate removal
-			if (r.Button == variabletypes.BT_Cab){
-				val = 0
-			}
-			else{
-				val = -1
-			}
 			var tmp = elevMap[config.ElevatorId]
-			tmp.OrderMatrix[r.Floor][r.Button] = val
+			tmp.OrderMatrix[r.Floor][r.Button] = false
 			elevMap[config.ElevatorId] = tmp
+			//Broadcast changes
+			msg := utilities.CreateMapCopy(elevMap)
+			NetworkMessageBroadcastCh<- msg
 		}
 	}
 }
