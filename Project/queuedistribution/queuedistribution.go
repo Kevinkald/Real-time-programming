@@ -28,14 +28,12 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 	tmp.ElevObj.State = variabletypes.MOVING
 	elevMap[config.ElevatorId] = tmp
 	*/
-	ticker := time.NewTicker(time.Millisecond * 500)
+	ticker := time.NewTicker(time.Millisecond * 200)
 
 
 	//Send initialized elevMap to broadcasting
 	//Important to copy the dynamic map before sending over channel
-	msg := variabletypes.NetworkMsg
-	msg.Info = utilities.CreateMapCopy(elevMap)
-	msg.Id = config.ElevatorId
+	msg := utilities.CreateMapCopy(elevMap)
 	NetworkMessageBroadcastCh<- msg
 	fmt.Println("Starting")
 	for {
@@ -53,9 +51,6 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			//Broadcast changes
 			msg := utilities.CreateMapCopy(elevMap)
 			NetworkMessageBroadcastCh<- msg
-			if (len(p.Peers)== 0){
-				ordersCh <- elevMap[config.ElevatorId].OrderMatrix
-			}
 
 		case n := <-networkMessageCh:
 			//fmt.Println(n)

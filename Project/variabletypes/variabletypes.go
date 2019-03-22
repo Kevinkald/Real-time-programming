@@ -61,7 +61,7 @@ type AllElevatorInfo map[string]SingleElevatorInfo
 
 //To be resolved
 
-type NetworkMsg struct{
+/*type NetworkMsg struct{
 	Id 	string
 	Info AllElevatorInfo
-}
+}*/
