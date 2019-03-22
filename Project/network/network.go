@@ -31,3 +31,4 @@ func Network(	peerUpdateCh chan<- variabletypes.PeerUpdate,
 	//Pass received networkmessages to NetWorkMessageCh
 	go bcast.Receiver(config.BroadcastPort, NetworkMessageCh)
 }
+// ikke send videre mld om det er din egen, dvs. endre mldtype

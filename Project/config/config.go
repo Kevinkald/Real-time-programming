@@ -10,6 +10,7 @@ func Init(){
 	ID = os.Args[2]
 }
 
+// ID ikke ferdig implementert
 const (
 
 	ElevatorId string = "1"
