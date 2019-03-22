@@ -68,3 +68,22 @@ func CheckForStop(elevator variabletypes.ElevatorObject, orders variabletypes.Si
 	}
 	return false
 }
+
+
+/*
+func DelegateOrder(elevMap variabletypes.AllElevatorInfo, buttonEvent variabletypes.ButtonEvent) string {
+	AllElevMap := utilities.CreateMapCopy(elevMap)
+	currentIP := invalidIP
+	currentDuration := 0
+	for id, info := range AllElevMap {
+		// hvis heisen er i live
+		currentElevator = AllElevMap[i]
+		elevDuration = costfunction.timeToServeRequest(currentElevator, buttonEvent)
+		if elevDuration <= currentDuration {
+			currentDuration = elevDuration
+			currentIP = i
+		}
+	}
+	return currentIP
+}
+*/

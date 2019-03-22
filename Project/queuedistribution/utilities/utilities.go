@@ -38,3 +38,33 @@ func PrintMap(a variabletypes.AllElevatorInfo){
 		}
 		//time.Sleep(200*time.Millisecond)
 }
+
+func IfEqual(buttonEvnt variabletypes.ButtonEvent, currentState variabletypes.ElevatorObject) int{
+    if buttonEvnt.Floor == currentState.Floor {
+        return 1
+    }
+    return 0
+}
+
+func Requests_clearAtCurrentFloor(e_old variabletypes.SingleElevatorInfo, buttonEvnt variabletypes.ButtonEvent, onClearedRequest func(buttonEvnt variabletypes.ButtonEvent, currentState variabletypes.ElevatorObject) int) (int, variabletypes.SingleElevatorInfo) {
+    var e variabletypes.SingleElevatorInfo = e_old
+    currentFloor := e.ElevObj.Floor
+
+    //var btn variabletypes.ButtonEvent.Button := 0
+    onCleared := 0
+    for btn := 0; btn < config.K_Buttons; btn ++ {
+        if e.OrderMatrix[currentFloor][btn] != 0 {   // if there is an order 
+            e.OrderMatrix[currentFloor][btn] = 0;    // clear it
+            onCleared = onClearedRequest(buttonEvnt, e.ElevObj)
+
+
+            /*
+            if(onClearedRequest(buttonEvnt, e.ElevObj) != 0) { // Hvordan sjekke om vi skal kjøre denne?
+                onCleared = onClearedRequest(buttonEvnt, e.ElevObj)
+            } 
+            */
+        }
+    } 
+    return onCleared, e;
+    
+}
