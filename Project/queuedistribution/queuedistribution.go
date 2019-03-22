@@ -21,8 +21,13 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 
 	//Just to check if elev obj syncs up
 	var tmp = elevMap[config.ElevatorId]
-	tmp.ElevObj.State = 2
+	tmp.ElevObj.Floor = 3
+	tmp.ElevObj.Dirn = 	variabletypes.MD_Up
+	tmp.ElevObj.State = variabletypes.MOVING
 	elevMap[config.ElevatorId] = tmp
+
+	printMapCh := make(chan variabletypes.AllElevatorInfo)
+	go utilities.PrintMap(printMapCh)
 
 
 	//Send initialized elevMap to broadcasting
@@ -32,8 +37,9 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 
 	for {
 		select{
-		case p := <-peerUpdateCh:
-			fmt.Println("Current alive nodes:",p.Peers)
+			//WHY DOES THIS FLICKER WHEN PRINTING??
+		//case p := <-peerUpdateCh:
+			//fmt.Println("Current alive nodes:",p.Peers)
 
 		case b:= <-ButtonsCh:
 			fmt.Println("Pushed button: {floor,type} ", b)
@@ -48,11 +54,11 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		case n := <-networkMessageCh:
 			//fmt.Println(n)
 			elevMap = synchronizationlogic.Synchronize(elevMap,n)
-			//Broadcast changes
+			//Broadcast changes and print
 			msg := utilities.CreateMapCopy(elevMap)
 			NetworkMessageBroadcastCh<- msg
 			time.Sleep(1*time.Millisecond)
-			utilities.PrintMap(elevMap)
+			printMapCh <- msg
 		
 		case r := <-removeOrderCh:
 			var tmp = elevMap[config.ElevatorId]
