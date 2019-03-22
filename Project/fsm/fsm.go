@@ -9,7 +9,7 @@ import(
 	"../variabletypes"
 )
 
-var currentState variabletypes.ElevatorcurrentState
+
 var singleElevator variabletypes.ElevatorObject
 var singleElevatorOrders variabletypes.SingleOrderMatrix 
 
@@ -18,8 +18,9 @@ func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 		 	removeOrderCh chan<- int) {
 	
 	elevio.Init(config.HardwarePort)
-	currentState = variabletypes.IDLE
-	//singleElevator.Floor := elevio.getFloor()
+	singleElevator.State = variabletypes.IDLE
+	singleElevator.Dirn = variabletypes.MD_Stop
+
 	elevatorStuckTimerResetCh := make(chan bool)
 	elevatorStuckTimerStopCh := make(chan bool)
 	elevatorStuckTimerOutCh := make(chan bool)
@@ -33,12 +34,13 @@ func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 	go fsmDoorTimer(doorTimerResetCh, doorTimerOutCh)
 	go elevio.PollFloorSensor(reachedFloorCh)
 
-	fmt.Println("Goroutines up and running")
+	fmt.Println("Fsm goroutines up and running")
 
 	for {
 		select {
 		case <- doorTimerOutCh:
-			fsmDoorTimeOut(removeOrderCh, elevatorStuckTimerResetCh)
+			fsmDoorTimeOut(removeOrderCh, elevatorStuckTimerResetCh, elevatorStuckTimerStopCh)
+			elevatorObjectCh <- singleElevator
 
 		case <- elevatorStuckTimerOutCh:
 			fsmElevatorStuckTimeOut()
@@ -46,60 +48,67 @@ func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 		case msg1 := <-ordersCh:
 			singleElevatorOrders = msg1
 			fsmNewOrder(doorTimerResetCh, elevatorStuckTimerResetCh)
+			elevatorObjectCh <- singleElevator
 
 		case msg2 := <-reachedFloorCh:
 			singleElevator.Floor = msg2
 			fsmReachedFloor(doorTimerResetCh, elevatorStuckTimerResetCh, elevatorStuckTimerStopCh)
+			elevatorObjectCh <- singleElevator
 		}
 	}
 }
 
 func fsmNewOrder(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- bool) {
-	switch currentState {
+	switch singleElevator.State {
 	case variabletypes.IDLE:
 		if orderlogic.CheckForStop(singleElevator, singleElevatorOrders) {
 			elevio.SetDoorOpenLamp(true)
 			doorTimerResetCh <- true
-			currentState = variabletypes.OPEN
+			singleElevator.State = variabletypes.OPEN
 		} else {
 			singleElevator.Dirn = orderlogic.ChooseNextDirection(singleElevator, singleElevatorOrders)
-			elevio.SetMotorDirection(singleElevator.Dirn)
-			elevatorStuckTimerResetCh <- true
-			currentState = variabletypes.MOVING
+			if singleElevator.Dirn != variabletypes.MD_Stop{							// BAD FIX!!!! Fix this with more clear communication
+				elevio.SetMotorDirection(singleElevator.Dirn)							// between modules
+				elevatorStuckTimerResetCh <- true
+				singleElevator.State = variabletypes.MOVING
+				fmt.Println("MOVING!!!!!!!!!!!!!!!!!!!!!!!!!")
+			}
+			
 		}
 	}
 }
 
 func fsmReachedFloor(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- bool, elevatorStuckTimerStopCh chan<- bool){
 	elevatorStuckTimerStopCh <- true
-	switch currentState {
+	switch singleElevator.State {
 	case variabletypes.MOVING:
 		if orderlogic.CheckForStop(singleElevator, singleElevatorOrders) {
 			elevio.SetMotorDirection(variabletypes.MD_Stop)
 			elevio.SetDoorOpenLamp(true)
 			doorTimerResetCh <- true
-			currentState = variabletypes.OPEN
+			singleElevator.State = variabletypes.OPEN
 		} else {
 			elevatorStuckTimerResetCh <- true
 		}
 	}
 }
 
-func fsmDoorTimeOut(removeOrderCh chan<- int, elevatorStuckTimerResetCh chan<- bool){
-	switch currentState {
+func fsmDoorTimeOut(removeOrderCh chan<- int, elevatorStuckTimerResetCh chan<- bool, elevatorStuckTimerStopCh chan<- bool){
+	switch singleElevator.State {
 	case variabletypes.OPEN:
 		fmt.Println("Closing doors")
 		removeOrderCh <- singleElevator.Floor
+		fmt.Println("Order removed")
 		elevio.SetDoorOpenLamp(false)
 		singleElevator.Dirn = orderlogic.ChooseNextDirection(singleElevator, singleElevatorOrders)
 		if singleElevator.Dirn == variabletypes.MD_Stop {
-			currentState = variabletypes.IDLE
+			singleElevator.State = variabletypes.IDLE
 			fmt.Println("Elevator in IDLE")
-			// elevatorStuckTimer.stop()
+			elevatorStuckTimerStopCh <- true
 		} else {
 			elevio.SetMotorDirection(singleElevator.Dirn)
 			elevatorStuckTimerResetCh <- true
-			currentState = variabletypes.MOVING
+			singleElevator.State = variabletypes.MOVING
 		}
 	}
 }

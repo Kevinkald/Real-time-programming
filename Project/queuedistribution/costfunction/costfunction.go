@@ -19,7 +19,7 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
     duration := 0
     TRAVEL_TIME := 10 
 
-    select {
+    switch e.ElevObj.State {
         //case behaviour = variabletypes.IDLE:
         case variabletypes.IDLE:
             e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e);

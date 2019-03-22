@@ -64,7 +64,7 @@ func CheckForStop(elevator variabletypes.ElevatorObject, orders variabletypes.Si
 	case variabletypes.MD_Up:
 		return (orders[elevator.Floor][0] || orders[elevator.Floor][2] || !ordersAbove(elevator, orders))
 	case variabletypes.MD_Stop:
-		return true
+		return (orders[elevator.Floor][0] || orders[elevator.Floor][1] || orders[elevator.Floor][2])
 	}
 	return false
 }

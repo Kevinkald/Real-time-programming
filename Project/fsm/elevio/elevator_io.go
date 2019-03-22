@@ -26,6 +26,13 @@ func Init(addr string) {
 	if err != nil {
 		panic(err.Error())
 	}
+	if getFloor() == -1{
+		SetMotorDirection(variabletypes.MD_Down)
+	}
+	for getFloor() == -1 {
+		// Wait until elevator reaches a floor
+	}
+	SetMotorDirection(variabletypes.MD_Stop)
 	_initialized = true
 }
 

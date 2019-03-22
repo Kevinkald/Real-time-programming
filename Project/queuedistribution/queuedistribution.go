@@ -89,7 +89,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			elevMap[config.ElevatorId] = tmp
 
 		case <-ticker.C:
-			utilities.PrintMap(utilities.CreateMapCopy(elevMap))
+			//utilities.PrintMap(utilities.CreateMapCopy(elevMap))
 
 		case <-networkMessageTicker.C:
 			msg.Info = utilities.CreateMapCopy(elevMap)
