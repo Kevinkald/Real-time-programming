@@ -17,8 +17,8 @@ func main(){
 
 	//Channels between Queuedistributor and Network module
 	peerUpdateCh := make(chan variabletypes.PeerUpdate)
-	networkMessageCh := make(chan variabletypes.AllElevatorInfo)
-	networkMessageBroadcastCh := make(chan variabletypes.AllElevatorInfo)
+	networkMessageCh := make(chan variabletypes.NetworkMsg)
+	networkMessageBroadcastCh := make(chan variabletypes.NetworkMsg)
 
 	//Channel between FSM and Queuedistributor module
 	ordersCh := make(chan variabletypes.SingleOrderMatrix)

@@ -11,8 +11,8 @@ import(
 )
 
 func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
-							networkMessageCh <-chan variabletypes.AllElevatorInfo,
-							NetworkMessageBroadcastCh chan<-  variabletypes.AllElevatorInfo,
+							networkMessageCh <-chan variabletypes.NetworkMsg,
+							NetworkMessageBroadcastCh chan<-  variabletypes.NetworkMsg,
 							ButtonsCh <-chan variabletypes.ButtonEvent,
 							removeOrderCh <-chan int,
 							ordersCh chan<- variabletypes.SingleOrderMatrix,
@@ -28,12 +28,15 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 	tmp.ElevObj.State = variabletypes.MOVING
 	elevMap[config.ElevatorId] = tmp
 	*/
+	networkMessageTicker := time.NewTicker(time.Millisecond * 50)
 	ticker := time.NewTicker(time.Millisecond * 500)
 
 
 	//Send initialized elevMap to broadcasting
 	//Important to copy the dynamic map before sending over channel
-	msg := variabletypes.NetworkMsg
+	var msg variabletypes.NetworkMsg
+	var p variabletypes.PeerUpdate
+
 	msg.Info = utilities.CreateMapCopy(elevMap)
 	msg.Id = config.ElevatorId
 	NetworkMessageBroadcastCh<- msg
@@ -51,7 +54,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			elevMap[config.ElevatorId] = tmp
 			elevio.SetButtonLamp(b.Button, b.Floor, true)
 			//Broadcast changes
-			msg := utilities.CreateMapCopy(elevMap)
+			msg.Info = utilities.CreateMapCopy(elevMap)
 			NetworkMessageBroadcastCh<- msg
 			if (len(p.Peers)== 0){
 				ordersCh <- elevMap[config.ElevatorId].OrderMatrix
@@ -59,11 +62,15 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 
 		case n := <-networkMessageCh:
 			//fmt.Println(n)
-			elevMap = synchronizationlogic.Synchronize(elevMap,n)
-			//Broadcast changes and print
-			msg := utilities.CreateMapCopy(elevMap)
-			NetworkMessageBroadcastCh<- msg
-			time.Sleep(1*time.Millisecond)
+			elevMap = synchronizationlogic.Synchronize(elevMap,n.Info)
+			//Broadcast changes and print 						NB: This should be done after given time intervals
+
+			//msg.Info = utilities.CreateMapCopy(elevMap)
+			//NetworkMessageBroadcastCh<- msg
+			//time.Sleep(1*time.Millisecond)
+
+			//Make nicer!
+			ordersCh <- elevMap[config.ElevatorId].OrderMatrix
 		
 		case r := <-removeOrderCh:
 			//todo: make this nicer
@@ -73,15 +80,21 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			}
 			elevMap[config.ElevatorId] = tmp
 			//Broadcast changes
-			msg := utilities.CreateMapCopy(elevMap)
+			msg.Info = utilities.CreateMapCopy(elevMap)
 			NetworkMessageBroadcastCh<- msg
 		
-		case q := <- elevatorObjectCh:
+		case q := <-elevatorObjectCh:
 			var tmp = elevMap[config.ElevatorId]
 			tmp.ElevObj = q
 			elevMap[config.ElevatorId] = tmp
-		case <- ticker.C:
+
+		case <-ticker.C:
 			utilities.PrintMap(utilities.CreateMapCopy(elevMap))
+
+		case <-networkMessageTicker.C:
+			msg.Info = utilities.CreateMapCopy(elevMap)
+			NetworkMessageBroadcastCh<- msg
+			time.Sleep(1*time.Millisecond)
 		}
 	}
 }
