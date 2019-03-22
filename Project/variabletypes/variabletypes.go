@@ -50,7 +50,7 @@ type ElevatorObject struct {
 	State ElevatorState
 }
 
-type SingleOrderMatrix [config.M_Floors][config.K_Buttons]bool
+type SingleOrderMatrix [config.N_Floors][config.N_Buttons]bool
 
 type SingleElevatorInfo struct {
 	OrderMatrix SingleOrderMatrix
