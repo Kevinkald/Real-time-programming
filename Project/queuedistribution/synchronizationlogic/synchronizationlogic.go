@@ -25,9 +25,9 @@ func Synchronize(	e_local variabletypes.AllElevatorInfo,
 
 		//2. Synchronize queues
 		//Loop through all elements in queues
-		for floor := 0; floor < config.M_Floors; floor++{
+		for floor := 0; floor < config.N_Floors; floor++{
 
-			for button := 0; button < config.K_Buttons; button++{
+			for button := 0; button < config.N_Buttons; button++{
 
 				//If the two queues have different values(true-false,false-true)
 				if (e_local[elevid].OrderMatrix[floor][button]!=e_received[elevid].OrderMatrix[floor][button]){

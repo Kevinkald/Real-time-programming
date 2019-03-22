@@ -1,13 +1,12 @@
 package main
 import(
-	"fmt"
+	//"fmt"
 	"runtime"
 	"./variabletypes"
 	//"time"
-	//"./buttons"
-	//"./network"
-	"./config"
-	//"./queuedistribution"
+	"./network"
+	//"./config"
+	"./queuedistribution"
 	"./fsm/elevio"
 	//"./fsm/fsmdummy"
 	"./fsm"
@@ -24,14 +23,14 @@ func main(){
 	//Channel between FSM and Queuedistributor module
 	ordersCh := make(chan variabletypes.SingleOrderMatrix)
 	elevatorObjectCh := make(chan variabletypes.ElevatorObject)
-	removeOrderCh := make(chan variabletypes.ElevatorObject)
+	removeOrderCh := make(chan int)
 
 	//Channel between Buttons and Queuedistributor module
 	buttonsCh := make(chan variabletypes.ButtonEvent)
 
 	go network.Network(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
 
-	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh,removeOrderCh)
+	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh,removeOrderCh,ordersCh,elevatorObjectCh)
 
 	go elevio.PollButtons(buttonsCh)
 

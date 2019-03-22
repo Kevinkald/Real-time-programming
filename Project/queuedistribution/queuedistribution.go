@@ -14,32 +14,33 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 							networkMessageCh <-chan variabletypes.AllElevatorInfo,
 							NetworkMessageBroadcastCh chan<-  variabletypes.AllElevatorInfo,
 							ButtonsCh <-chan variabletypes.ButtonEvent,
-							removeOrderCh <-chan variabletypes.ButtonEvent) {
+							removeOrderCh <-chan int,
+							ordersCh chan<- variabletypes.SingleOrderMatrix,
+		 					elevatorObjectCh <-chan variabletypes.ElevatorObject) {
 
 
 	elevMap := utilities.InitMap()
 
-	//Just to check if elev obj syncs up
+	/*Just to check if elev obj syncs up
 	var tmp = elevMap[config.ElevatorId]
-	tmp.ElevObj.Floor = 3
+	tmp.ElevObj.Floor = 2
 	tmp.ElevObj.Dirn = 	variabletypes.MD_Up
 	tmp.ElevObj.State = variabletypes.MOVING
 	elevMap[config.ElevatorId] = tmp
-
-	printMapCh := make(chan variabletypes.AllElevatorInfo)
-	go utilities.PrintMap(printMapCh)
+	*/
+	ticker := time.NewTicker(time.Millisecond * 500)
 
 
 	//Send initialized elevMap to broadcasting
 	//Important to copy the dynamic map before sending over channel
 	msg := utilities.CreateMapCopy(elevMap)
 	NetworkMessageBroadcastCh<- msg
-
+	fmt.Println("Starting")
 	for {
 		select{
 			//WHY DOES THIS FLICKER WHEN PRINTING??
-		//case p := <-peerUpdateCh:
-			//fmt.Println("Current alive nodes:",p.Peers)
+		case p := <-peerUpdateCh:
+			fmt.Println("Current alive nodes:",p.Peers)
 
 		case b:= <-ButtonsCh:
 			fmt.Println("Pushed button: {floor,type} ", b)
@@ -58,15 +59,24 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			msg := utilities.CreateMapCopy(elevMap)
 			NetworkMessageBroadcastCh<- msg
 			time.Sleep(1*time.Millisecond)
-			printMapCh <- msg
 		
 		case r := <-removeOrderCh:
+			//todo: make this nicer
 			var tmp = elevMap[config.ElevatorId]
-			tmp.OrderMatrix[r.Floor][r.Button] = false
+			for button := 0; button < config.N_Buttons; button++{
+				tmp.OrderMatrix[r][button] = false
+			}
 			elevMap[config.ElevatorId] = tmp
 			//Broadcast changes
 			msg := utilities.CreateMapCopy(elevMap)
 			NetworkMessageBroadcastCh<- msg
+		
+		case q := <- elevatorObjectCh:
+			var tmp = elevMap[config.ElevatorId]
+			tmp.ElevObj = q
+			elevMap[config.ElevatorId] = tmp
+		case <- ticker.C:
+			utilities.PrintMap(utilities.CreateMapCopy(elevMap))
 		}
 	}
 }

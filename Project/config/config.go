@@ -1,6 +1,14 @@
 package config
+import "os"
+
+var Port string
+var ID string
 
 
+func Init(){
+	Port = os.Args[1]
+	ID = os.Args[2]
+}
 
 const (
 
