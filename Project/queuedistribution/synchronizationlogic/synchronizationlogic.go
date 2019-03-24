@@ -4,7 +4,8 @@ import(
 	"../../variabletypes"
 	"../../config"
 	"../utilities"
-	//"fmt"
+	"fmt"
+	"../../fsm/elevio"
 )
 
 func Synchronize(	e_local variabletypes.AllElevatorInfo,
@@ -31,28 +32,36 @@ func Synchronize(	e_local variabletypes.AllElevatorInfo,
 
 				//If the two queues have different values(true-false,false-true)
 				if (e_local[elevid].OrderMatrix[floor][button]!=e_received[elevid].OrderMatrix[floor][button]){
+					fmt.Println("synch logic: entered true-false cond")
 					//Set queue element to true(union)
 					var tmp = e_synched[elevid]
 					tmp.OrderMatrix[floor][button] = true
 					e_synched[elevid] = tmp 
 					//If the local is the one having false
 					if (!e_local[elevid].OrderMatrix[floor][button]){
+						fmt.Println("synch logic: entered local one having the false")
 						//If local elev is also IDLE||OPEN, remove order if in that corresponding floor
-						if ((e_local[elevid].ElevObj.State==variabletypes.IDLE)||
-							(e_local[elevid].ElevObj.State==variabletypes.OPEN)){
-							if (e_local[elevid].ElevObj.Floor==floor){
-								var tmp = e_synched[elevid]
-								tmp.OrderMatrix[floor][button] = false
-								e_synched[elevid] = tmp 
-							}
-						}
-					} else if((e_received[elevid].ElevObj.State==variabletypes.IDLE))||
-							(e_received[elevid].ElevObj.State==variabletypes.OPEN){
-							if (e_received[elevid].ElevObj.Floor==floor){
-								var tmp = e_synched[elevid]
-								tmp.OrderMatrix[floor][button] = false
-								e_synched[elevid] = tmp 
-							}
+						if (((e_local[elevid].ElevObj.State==variabletypes.IDLE)||
+							(e_local[elevid].ElevObj.State==variabletypes.OPEN))&&
+							(e_local[elevid].ElevObj.Floor==floor)){
+							fmt.Println("synch logic: remove order")
+							var tmp = e_synched[elevid]
+							tmp.OrderMatrix[floor][button] = false
+							e_synched[elevid] = tmp 
+							elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, false)
+						} else {
+							elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, true)
+						}//If the received is the one having false
+					} else if(((e_received[elevid].ElevObj.State==variabletypes.IDLE)||
+							(e_received[elevid].ElevObj.State==variabletypes.OPEN))&&
+							(e_received[elevid].ElevObj.Floor==floor)){
+						fmt.Println("synch logic: remove order")
+						var tmp = e_synched[elevid]
+						tmp.OrderMatrix[floor][button] = false
+						e_synched[elevid] = tmp 
+						elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, false)
+					} else {
+						elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, true)
 					}
 				}
 			}
