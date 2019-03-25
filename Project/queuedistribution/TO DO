@@ -1,4 +1,3 @@
 TO DO 
-- func Requests_clearAtCurrentFloor
+
 - finne ut hvordan man finner inner button i ifequal, utilities
-- sette DOOR_OPEN_TIME og TRAVEL_TIME i time to serve

@@ -8,6 +8,7 @@ import(
 	"./utilities"
 	"../fsm/elevio"
 	"./synchronizationlogic"
+	"./costfunction"
 )
 
 func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
@@ -37,30 +38,33 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 	msg.Info = utilities.CreateMapCopy(elevMap)
 	msg.Id = config.ElevatorId
 	NetworkMessageBroadcastCh<- msg
+
 	fmt.Println("Starting")
+
+	var p variabletypes.PeerUpdate
 
 	for {
 		select{
 			//WHY DOES THIS FLICKER WHEN PRINTING??
-		case p := <-peerUpdateCh: 
-			//type PeerUpdate struct {
-			//		Peers []string
-			// 		New   string
-			//		Lost  []string
-}
+		case new_p := <-peerUpdateCh: 
+			p = new_p
 			fmt.Println("Current alive nodes:",p.Peers)
 
 		case b:= <-ButtonsCh:
 			fmt.Println("Pushed button: {floor,type} ", b)
-			var tmp = elevMap[config.ElevatorId]
+			
 
 			// find best elevator to take order and set corresponding queue 
-			chosenElevator := costfunction.DelegateOrder(elevMap, p.Peers, b, msg.Id) // får den tak i p?
+			chosenElevator := costfunction.DelegateOrder(elevMap, p, b, msg.Id)
 			if chosenElevator == config.InvalidId {
 				fmt.Println("Error: invalid Id")
 			}
-			elevMap[chosenElevator].OrderMatrix[b.Floor][b.Button] = true
+			var tmptwo = elevMap[chosenElevator]
+			tmptwo.OrderMatrix[b.Floor][b.Button] = true
+			elevMap[chosenElevator] = tmptwo
 
+			// hva skjer her?
+			var tmp = elevMap[config.ElevatorId]
 			tmp.OrderMatrix[b.Floor][b.Button] = true
 			elevMap[config.ElevatorId] = tmp
 
@@ -84,7 +88,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		case r := <-removeOrderCh:
 			//todo: make this nicer
 			var tmp = elevMap[config.ElevatorId]
-			utilities.ClearOrder(r, tmp.OrderMatrix) 
+			utilities.ClearOrder(r, tmp) 
 			elevMap[config.ElevatorId] = tmp
 
 			//Broadcast changes
