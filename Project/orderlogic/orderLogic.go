@@ -60,9 +60,9 @@ func ChooseNextDirection(elevator variabletypes.ElevatorObject, orders variablet
 func CheckForStop(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix) bool{
 	switch elevator.Dirn {
 	case variabletypes.MD_Down:
-		return (orders[elevator.Floor][1] || orders[elevator.Floor][2] || !ordersBelow(elevator, orders))
+		return (orders[elevator.Floor][1] || orders[elevator.Floor][2] || !ordersBelow(elevator, orders) || elevator.Floor == 0)
 	case variabletypes.MD_Up:
-		return (orders[elevator.Floor][0] || orders[elevator.Floor][2] || !ordersAbove(elevator, orders))
+		return (orders[elevator.Floor][0] || orders[elevator.Floor][2] || !ordersAbove(elevator, orders) || elevator.Floor == (config.N_Floors - 1))
 	case variabletypes.MD_Stop:
 		return true
 	}
