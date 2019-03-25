@@ -59,8 +59,6 @@ type SingleElevatorInfo struct {
 
 type AllElevatorInfo map[string]SingleElevatorInfo
 
-//To be resolved
-
 type NetworkMsg struct{
 	Id 	string
 	Info AllElevatorInfo
