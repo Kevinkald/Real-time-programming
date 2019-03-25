@@ -13,7 +13,7 @@ func ConfigInit(){
 }
 
 const (
-
+	InvalidId string = "0"
 	N_Floors int = 4
 	N_Buttons int = 3
 	N_Elevators int = 2
@@ -21,4 +21,6 @@ const (
 	PeerPort int = 20012
 	BroadcastPort int = 30012
 	//15657
+	TRAVEL_TIME int = 3
+	DOOR_OPEN_TIME int = 2
 )
