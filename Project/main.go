@@ -5,7 +5,7 @@ import(
 	"./variabletypes"
 	//"time"
 	"./network"
-	//"./config"
+	"./config"
 	"./queuedistribution"
 	"./fsm/elevio"
 	//"./fsm/fsmdummy"
@@ -14,6 +14,10 @@ import(
 
 func main(){
 	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	config.ConfigInit()
+
+	elevio.Init("localhost:" + config.ElevatorPort)
 
 	//Channels between Queuedistributor and Network module
 	peerUpdateCh := make(chan variabletypes.PeerUpdate)

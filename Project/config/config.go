@@ -1,29 +1,26 @@
 package config
 import "os"
+import "fmt"
 
-var Port string
-var ID string
+var ElevatorPort string
+var ElevatorId string
 
 
-func Init(){
-	Port = os.Args[1]
-	ID = os.Args[2]
+func ConfigInit(){
+	ElevatorId = os.Args[1]
+	ElevatorPort = os.Args[2]
+	fmt.Println(ElevatorPort)
 }
 
-// ID ikke ferdig implementert
 const (
-
-	ElevatorId string = "1"
 	InvalidId string = "0"
-
 	N_Floors int = 4
 	N_Buttons int = 3
 	N_Elevators int = 2
 
 	PeerPort int = 20012
 	BroadcastPort int = 30012
-	SimulatorPort string = "localhost:16001"
-	HardwarePort string = "localhost:15657"
+
 	TRAVEL_TIME int = 3 
     DOOR_OPEN_TIME int = 2
 )
