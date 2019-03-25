@@ -17,7 +17,7 @@ func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 		 	elevatorObjectCh chan<- variabletypes.ElevatorObject,
 		 	removeOrderCh chan<- int) {
 	
-	elevio.Init(config.ElevatorPort)
+	
 	singleElevator.State = variabletypes.IDLE
 	singleElevator.Dirn = variabletypes.MD_Stop
 
@@ -85,6 +85,9 @@ func fsmReachedFloor(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh cha
 		if orderlogic.CheckForStop(singleElevator, singleElevatorOrders) {
 			elevio.SetMotorDirection(variabletypes.MD_Stop)
 			elevio.SetDoorOpenLamp(true)
+			if (singleElevator.Floor == config.N_Floors - 1 || singleElevator.Floor == 0){
+				singleElevator.Dirn = variabletypes.MD_Stop
+			}
 			doorTimerResetCh <- true
 			singleElevator.State = variabletypes.OPEN
 		} else {
