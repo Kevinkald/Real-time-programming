@@ -38,10 +38,13 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
 
     for {
         if orderlogic.CheckForStop(e) {
-
-            arrivedAtRequest = utilities.IfEqual(floor, e.ElevObj.Floor)
-            e = utilities.Requests_clearAtCurrentFloor(e, IfEqual(floor, e.ElevObj.Floor))
-            if arrivedAtRequest {
+            temp, _ = utilities.Requests_clearAtCurrentFloor(e, IfEqual(button, floor, e.ElevObj))
+            if temp {
+                arrivedAtRequest = 1
+            }
+            
+            _, e = utilities.Requests_clearAtCurrentFloor(e, IfEqual(button, floor, e.ElevObj))
+            if arrivedAtRequest == 1 {
                 return duration
             }
 
@@ -52,4 +55,31 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
         e.ElevObj.Floor += e.ElevObj.Dirn
         duration += TRAVEL_TIME
     }
+}
+
+
+func DelegateOrder(elevMap variabletypes.AllElevatorInfo, buttonEvent variabletypes.ButtonEvent) string {
+
+    AllElevMap := utilities.CreateMapCopy(elevMap)
+    currentIP := invalidIP
+    currentDuration := 0
+    button := buttonEvent.Button
+
+
+    if button == BT_Cab {
+        return // min id  
+    }
+
+    for id, info := range AllElevMap {
+        // hvis heisen er i live
+        currentElevator = AllElevMap[i]
+        elevDuration = timeToServeRequest(currentElevator, buttonEvent)
+
+        if elevDuration <= currentDuration {
+            currentDuration = elevDuration
+            currentIP = i
+
+        }
+    }
+    return currentIP
 }

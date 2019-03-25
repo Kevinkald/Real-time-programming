@@ -39,32 +39,45 @@ func PrintMap(a variabletypes.AllElevatorInfo){
 		//time.Sleep(200*time.Millisecond)
 }
 
-func IfEqual(buttonEvnt variabletypes.ButtonEvent, currentState variabletypes.ElevatorObject) int{
-    if buttonEvnt.Floor == currentState.Floor {
-        return 1
+func IfEqual(requestedButton variabletypes.ButtonType, requestedFloor variabletypes.ButtonType, currentState variabletypes.ElevatorObject) bool {
+	currentState.Floor := inner_f
+	// currentState.Button := inner_b
+	if inner_b == requestedButton && inner_f == requestedFloor {
+        return true
     }
-    return 0
+    return false
 }
 
-func Requests_clearAtCurrentFloor(e_old variabletypes.SingleElevatorInfo, buttonEvnt variabletypes.ButtonEvent, onClearedRequest func(buttonEvnt variabletypes.ButtonEvent, currentState variabletypes.ElevatorObject) int) (int, variabletypes.SingleElevatorInfo) {
+
+func Requests_clearAtCurrentFloor(e_old variabletypes.SingleElevatorInfo, buttonEvnt variabletypes.ButtonEvent, onClearedRequest func(requestedButton variabletypes.ButtonType, requestedFloor variabletypes.ButtonType, currentState variabletypes.ElevatorObject) int) (int, variabletypes.SingleElevatorInfo) {
     var e variabletypes.SingleElevatorInfo = e_old
     currentFloor := e.ElevObj.Floor
 
-    //var btn variabletypes.ButtonEvent.Button := 0
-    onCleared := 0
-    for btn := 0; btn < config.N_Buttons; btn ++ {
+    var btn variabletypes.ButtonEvent := 0
+    onCleared := false
+
+    for btn = 0; btn < config.N_Buttons; btn ++ {
         if e.OrderMatrix[currentFloor][btn] != false {   // if there is an order 
-            e.OrderMatrix[currentFloor][btn] = false;    // clear it
-            onCleared = onClearedRequest(buttonEvnt, e.ElevObj)
-
-
-            /*
-            if(onClearedRequest(buttonEvnt, e.ElevObj) != 0) { // Hvordan sjekke om vi skal kjøre denne?
-                onCleared = onClearedRequest(buttonEvnt, e.ElevObj)
-            } 
-            */
+            e.OrderMatrix[currentFloor][btn] = 0;    // clear it
+            onCleared = onClearedRequest(btn, currentFloor, e.ElevObj) // er dette riktig floor? 2. argument
         }
     } 
     return onCleared, e;
-    
 }
+
+
+func ClearOrder(r variabletypes.ButtonEvent.Floor, Orders variabletypes.SingleElevatorInfo.OrderMatrix) {
+        for button := 0; button < config.N_Buttons; button++{
+            tmp.OrderMatrix[r][button] = false      
+        }
+}
+
+
+
+
+
+
+
+
+
+

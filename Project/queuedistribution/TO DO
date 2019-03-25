@@ -1,0 +1,9 @@
+TO DO 
+- legg inn hvis heisen er i live i delegator
+	- legg inn at den må delegere fra antall alive ikke bare id
+- fikse select i cost func
+- func Requests_clearAtCurrentFloor
+- finne ut hvordan man finner inner button i ifequal, utilities
+- riktig argument i req-clearatcurrent, der ifequal kalles
+- sette DOOR_OPEN_TIME og TRAVEL_TIME i time to serve
+- fiks invalidIP 

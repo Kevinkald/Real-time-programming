@@ -47,9 +47,16 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		case b:= <-ButtonsCh:
 			fmt.Println("Pushed button: {floor,type} ", b)
 			var tmp = elevMap[config.ElevatorId]
+
+			// find best elevator to take order and set queue 
+			chosenElevator := costfunction.DelegateOrder(elevMap, b)
+			elevMap[chosenElevator].OrderMatrix[b.Floor][b.Button] = true
+
 			tmp.OrderMatrix[b.Floor][b.Button] = true
 			elevMap[config.ElevatorId] = tmp
+
 			elevio.SetButtonLamp(b.Button, b.Floor, true)
+
 			//Broadcast changes
 			msg := utilities.CreateMapCopy(elevMap)
 			NetworkMessageBroadcastCh<- msg
@@ -68,10 +75,9 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		case r := <-removeOrderCh:
 			//todo: make this nicer
 			var tmp = elevMap[config.ElevatorId]
-			for button := 0; button < config.N_Buttons; button++{
-				tmp.OrderMatrix[r][button] = false
-			}
+			utilities.ClearOrder(r, tmp.OrderMatrix) 
 			elevMap[config.ElevatorId] = tmp
+
 			//Broadcast changes
 			msg := utilities.CreateMapCopy(elevMap)
 			NetworkMessageBroadcastCh<- msg
@@ -85,3 +91,5 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		}
 	}
 }
+
+
