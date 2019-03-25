@@ -21,6 +21,7 @@ const (
 	PeerPort int = 20012
 	BroadcastPort int = 30012
 
+
 	TRAVEL_TIME int = 3 
     DOOR_OPEN_TIME int = 2
 )
