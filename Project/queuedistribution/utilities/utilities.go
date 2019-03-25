@@ -59,7 +59,7 @@ func Requests_clearAtCurrentFloor(e_old variabletypes.SingleElevatorInfo, button
     for btn = 0; btn < config.N_Buttons; btn ++ {
         if e.OrderMatrix[currentFloor][btn] != false {   // if there is an order 
             e.OrderMatrix[currentFloor][btn] = 0;    // clear it
-            onCleared = onClearedRequest(btn, currentFloor, e.ElevObj) // er dette riktig floor? 2. argument
+            onCleared = onClearedRequest(btn, buttonEvnt.Floor, e.ElevObj) // er dette riktig floor? 2. argument
         }
     } 
     return onCleared, e;

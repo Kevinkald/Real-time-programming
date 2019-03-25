@@ -13,14 +13,13 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
 
     var e variabletypes.SingleElevatorInfo = e_old
     e.OrderMatrix[floor][button] = 1
-    behaviour := e.ElevObj.State
 
     arrivedAtRequest := 0
     duration := 0
     TRAVEL_TIME := 10 
 
-    select {
-        //case behaviour = variabletypes.IDLE:
+    switch behaviour := e.ElevObj.State {
+
         case variabletypes.IDLE:
             e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e);
             if e.ElevObj.Dirn == MD_Stop {
@@ -57,27 +56,25 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
     }
 }
 
-
-func DelegateOrder(elevMap variabletypes.AllElevatorInfo, buttonEvent variabletypes.ButtonEvent) string {
+func DelegateOrder(elevMap variabletypes.AllElevatorInfo, listOfPeers variabletypes.PeerUpdate.Peers, buttonEvent variabletypes.ButtonEvent, myID variabletypes.NetworkMsg.Id ) string {
 
     AllElevMap := utilities.CreateMapCopy(elevMap)
-    currentIP := invalidIP
+    currentIP := config.InvalidId
     currentDuration := 0
     button := buttonEvent.Button
 
-
     if button == BT_Cab {
-        return // min id  
+        return myID 
     }
 
-    for id, info := range AllElevMap {
-        // hvis heisen er i live
-        currentElevator = AllElevMap[i]
+    for ip := range listOfPeers {
+
+        currentElevator = AllElevMap[id]
         elevDuration = timeToServeRequest(currentElevator, buttonEvent)
 
         if elevDuration <= currentDuration {
             currentDuration = elevDuration
-            currentIP = i
+            currentIP = ip
 
         }
     }

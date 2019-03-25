@@ -38,18 +38,27 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 	msg.Id = config.ElevatorId
 	NetworkMessageBroadcastCh<- msg
 	fmt.Println("Starting")
+
 	for {
 		select{
 			//WHY DOES THIS FLICKER WHEN PRINTING??
-		case p := <-peerUpdateCh:
+		case p := <-peerUpdateCh: 
+			//type PeerUpdate struct {
+			//		Peers []string
+			// 		New   string
+			//		Lost  []string
+}
 			fmt.Println("Current alive nodes:",p.Peers)
 
 		case b:= <-ButtonsCh:
 			fmt.Println("Pushed button: {floor,type} ", b)
 			var tmp = elevMap[config.ElevatorId]
 
-			// find best elevator to take order and set queue 
-			chosenElevator := costfunction.DelegateOrder(elevMap, b)
+			// find best elevator to take order and set corresponding queue 
+			chosenElevator := costfunction.DelegateOrder(elevMap, p.Peers, b, msg.Id) // får den tak i p?
+			if chosenElevator == config.InvalidId {
+				fmt.Println("Error: invalid Id")
+			}
 			elevMap[chosenElevator].OrderMatrix[b.Floor][b.Button] = true
 
 			tmp.OrderMatrix[b.Floor][b.Button] = true

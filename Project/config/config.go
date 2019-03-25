@@ -14,6 +14,7 @@ func Init(){
 const (
 
 	ElevatorId string = "1"
+	InvalidId string = "0"
 
 	N_Floors int = 4
 	N_Buttons int = 3
