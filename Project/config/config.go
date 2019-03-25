@@ -13,7 +13,7 @@ func Init(){
 // ID ikke ferdig implementert
 const (
 
-	ElevatorId string = "2"
+	ElevatorId string = "1"
 
 	N_Floors int = 4
 	N_Buttons int = 3
@@ -21,6 +21,5 @@ const (
 
 	PeerPort int = 20012
 	BroadcastPort int = 30012
-	SimulatorPort string = "localhost:16002"
-	HardwarePort string = "localhost:15657"
+	ElevatorPort string = "localhost:15658"
 )

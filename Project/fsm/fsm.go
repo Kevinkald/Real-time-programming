@@ -17,7 +17,7 @@ func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 		 	elevatorObjectCh chan<- variabletypes.ElevatorObject,
 		 	removeOrderCh chan<- int) {
 	
-	elevio.Init(config.SimulatorPort)
+	elevio.Init(config.ElevatorPort)
 	singleElevator.State = variabletypes.IDLE
 	singleElevator.Dirn = variabletypes.MD_Stop
 

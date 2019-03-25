@@ -29,7 +29,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 	elevMap[config.ElevatorId] = tmp
 	*/
 	ticker := time.NewTicker(time.Millisecond * 200)
-	networkMessageTicker := time.NewTicker(time.Millisecond * 50)
+	networkMessageTicker := time.NewTicker(time.Millisecond * 15)
 
 	//Send initialized elevMap to broadcasting
 	//Important to copy the dynamic map before sending over channel
