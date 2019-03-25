@@ -29,7 +29,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 	tmp.ElevObj.State = variabletypes.MOVING
 	elevMap[config.ElevatorId] = tmp
 	*/
-	ticker := time.NewTicker(time.Millisecond * 200)
+	ticker := time.NewTicker(time.Millisecond * 1000000)
 	networkMessageTicker := time.NewTicker(time.Millisecond * 15)
 	orderChannelTicker := time.NewTicker(time.Millisecond * 100)
 
@@ -37,6 +37,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 	//Send initialized elevMap to broadcasting
 	//Important to copy the dynamic map before sending over channel
 	var msg variabletypes.NetworkMsg
+	var p variabletypes.PeerUpdate
 
 	msg.Info = utilities.CreateMapCopy(elevMap)
 	msg.Id = config.ElevatorId
@@ -60,14 +61,9 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			if chosenElevator == config.InvalidId {
 				fmt.Println("Error: invalid Id")
 			}
-			var tmptwo = elevMap[chosenElevator]
-			tmptwo.OrderMatrix[b.Floor][b.Button] = true
-			elevMap[chosenElevator] = tmptwo
-
-			// hva skjer her?
-			var tmp = elevMap[config.ElevatorId]
+			var tmp = elevMap[chosenElevator]
 			tmp.OrderMatrix[b.Floor][b.Button] = true
-			elevMap[config.ElevatorId] = tmp
+			elevMap[chosenElevator] = tmp
 
 			elevio.SetButtonLamp(b.Button, b.Floor, true)
 
@@ -110,7 +106,10 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			//todo: make this nicer
 			var tmp = elevMap[config.ElevatorId]
 
-			utilities.ClearOrder(r, tmp) 
+			for button := 0; button < config.N_Buttons; button++{
+				tmp.OrderMatrix[r][button] = false
+				elevio.SetButtonLamp(variabletypes.ButtonType(button), r, false)
+			}
 			elevMap[config.ElevatorId] = tmp
 
 			//Broadcast changes

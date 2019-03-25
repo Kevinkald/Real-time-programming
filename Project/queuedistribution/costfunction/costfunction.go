@@ -6,7 +6,8 @@ import (
     "../../config"
     "../utilities"
     "math"
-    "strconv"
+    //"strconv"
+    "fmt"
 )
 
 
@@ -14,7 +15,7 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
     var e variabletypes.SingleElevatorInfo = e_old
     e.OrderMatrix[buttonEvnt.Floor][buttonEvnt.Button] = true
     duration := 0
-
+    fmt.Println(e.ElevObj.State)
     switch e.ElevObj.State {
         case variabletypes.IDLE:
             e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e.ElevObj, e.OrderMatrix);
@@ -56,14 +57,18 @@ func DelegateOrder(elevMap variabletypes.AllElevatorInfo, structOfPeers variable
     currentDuration := int(math.Inf(1))
     button := buttonEvent.Button
 
+    fmt.Println("list of active nodes: ", listOfPeers)
+
     if button == variabletypes.BT_Cab {
         return myID 
     }
-    for id_int := range listOfPeers {
-        id := strconv.Itoa(id_int)
+    for _,id := range listOfPeers {
+
+        fmt.Println("entere for loop")
         
         currentElevator := AllElevMap[id]
         elevDuration := TimeToServeRequest(currentElevator, buttonEvent)
+        fmt.Println("calculated elevDur to be: ", elevDuration)
 
         if elevDuration <= currentDuration {
             currentDuration = elevDuration
