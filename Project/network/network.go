@@ -14,8 +14,8 @@ import (
 )
 
 func Network(	peerUpdateCh chan<- variabletypes.PeerUpdate, 
-				NetworkMessageCh chan<-  variabletypes.AllElevatorInfo,
-				NetworkMessageBroadcastCh <-chan  variabletypes.AllElevatorInfo) {
+				NetworkMessageCh chan<-  variabletypes.NetworkMsg,
+				NetworkMessageBroadcastCh <-chan  variabletypes.NetworkMsg) {
 
 	// We can disable/enable the transmitter after it has been started.
 	// This could be used to signal that we are somehow "unavailable".

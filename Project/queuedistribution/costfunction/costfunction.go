@@ -3,8 +3,10 @@ package costfunction
 import (
     "../../variabletypes"
     "../../orderlogic"
+    "../../config"
     "../utilities"
     "math"
+    "strconv"
 )
 
 
@@ -13,7 +15,7 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
     floor := buttonEvnt.Floor
 
     var e variabletypes.SingleElevatorInfo = e_old
-    e.OrderMatrix[floor][button] = 1
+    e.OrderMatrix[floor][button] = true
 
     arrivedAtRequest := 0
     duration := 0
@@ -23,14 +25,14 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
     switch e.ElevObj.State {
 
         case variabletypes.IDLE:
-            e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e);
+            e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e.ElevObj, e.OrderMatrix);
             if e.ElevObj.Dirn == variabletypes.MD_Stop {
                 return duration
             }
             break
         case variabletypes.MOVING:
             duration += TRAVEL_TIME/2
-            e.ElevObj.Floor += e.ElevObj.Dirn
+            e.ElevObj.Floor += int(e.ElevObj.Dirn)
             break;
         case variabletypes.OPEN:
             duration -= DOOR_OPEN_TIME/2
@@ -38,19 +40,19 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
     }
 
     for {
-        if orderlogic.CheckForStop(e) {
-            temp, _ = utilities.Requests_clearAtCurrentFloor(e, buttonEvnt)
+        if orderlogic.CheckForStop(e.ElevObj, e.OrderMatrix) {
+            temp, _ := utilities.Requests_clearAtCurrentFloor(e, buttonEvnt)
             if temp {
                 arrivedAtRequest = 1
             }
             
-            _, e = utilities.Requests_clearAtCurrentFloor(e, buttonEvnt)
+            _, e := utilities.Requests_clearAtCurrentFloor(e, buttonEvnt)
             if arrivedAtRequest == 1 {
                 return duration
             }
 
             duration += DOOR_OPEN_TIME
-            e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e)
+            e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e.ElevObj, e.OrderMatrix)
         }
 
         e.ElevObj.Floor += int(e.ElevObj.Dirn)
@@ -60,19 +62,20 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
 
 //func DelegateOrder(elevMap variabletypes.AllElevatorInfo, listOfPeers variabletypes.PeerUpdate.Peers, buttonEvent variabletypes.ButtonEvent, myID variabletypes.NetworkMsg.Id ) string {
 func DelegateOrder(elevMap variabletypes.AllElevatorInfo, structOfPeers variabletypes.PeerUpdate, buttonEvent variabletypes.ButtonEvent, myID string ) string {
-    structOfPeers.Peers := listOfPeers
-    AllElevMap := utilities.CrelistOfPeersateMapCopy(elevMap)
+    listOfPeers := structOfPeers.Peers
+    AllElevMap := utilities.CreateMapCopy(elevMap)
     currentId := config.InvalidId
-    currentDuration := Inf(1)
+    currentDuration := int(math.Inf(1))
     button := buttonEvent.Button
 
-    if button == BT_Cab {
+    if button == variabletypes.BT_Cab {
         return myID 
     }
-    for id := range listOfPeers {
+    for id_int := range listOfPeers {
 
-        currentElevator = AllElevMap[id]
-        elevDuration = timeToServeRequest(currentElevator, buttonEvent)
+        id := strconv.Itoa(id_int)
+        currentElevator := AllElevMap[id]
+        elevDuration := TimeToServeRequest(currentElevator, buttonEvent)
 
         if elevDuration <= currentDuration {
             currentDuration = elevDuration
@@ -82,3 +85,7 @@ func DelegateOrder(elevMap variabletypes.AllElevatorInfo, structOfPeers variable
     }
     return currentId
 }
+
+
+
+
