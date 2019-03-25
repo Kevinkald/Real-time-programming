@@ -24,4 +24,6 @@ const (
 	BroadcastPort int = 30012
 	SimulatorPort string = "localhost:16001"
 	HardwarePort string = "localhost:15657"
+	TRAVEL_TIME int = 3 
+    DOOR_OPEN_TIME int = 2
 )

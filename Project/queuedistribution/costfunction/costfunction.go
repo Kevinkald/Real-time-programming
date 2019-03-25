@@ -11,19 +11,11 @@ import (
 
 
 func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt variabletypes.ButtonEvent) int { 
-    button := buttonEvnt.Button
-    floor := buttonEvnt.Floor
-
     var e variabletypes.SingleElevatorInfo = e_old
-    e.OrderMatrix[floor][button] = true
-
-    arrivedAtRequest := 0
+    e.OrderMatrix[buttonEvnt.Floor][buttonEvnt.Button] = true
     duration := 0
-    TRAVEL_TIME := 3 
-    DOOR_OPEN_TIME := 2
 
     switch e.ElevObj.State {
-
         case variabletypes.IDLE:
             e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e.ElevObj, e.OrderMatrix);
             if e.ElevObj.Dirn == variabletypes.MD_Stop {
@@ -31,32 +23,27 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
             }
             break
         case variabletypes.MOVING:
-            duration += TRAVEL_TIME/2
+            duration += config.TRAVEL_TIME/2
             e.ElevObj.Floor += int(e.ElevObj.Dirn)
             break;
         case variabletypes.OPEN:
-            duration -= DOOR_OPEN_TIME/2
-
+            duration -= config.DOOR_OPEN_TIME/2
     }
 
     for {
         if orderlogic.CheckForStop(e.ElevObj, e.OrderMatrix) {
-            temp, _ := utilities.Requests_clearAtCurrentFloor(e, buttonEvnt)
-            if temp {
-                arrivedAtRequest = 1
-            }
-            
-            _, e := utilities.Requests_clearAtCurrentFloor(e, buttonEvnt)
-            if arrivedAtRequest == 1 {
+            arrivedAtRequest, e := utilities.Requests_clearAtCurrentFloor(e, buttonEvnt)
+
+            if arrivedAtRequest {
                 return duration
             }
 
-            duration += DOOR_OPEN_TIME
+            duration += config.DOOR_OPEN_TIME
             e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e.ElevObj, e.OrderMatrix)
         }
 
         e.ElevObj.Floor += int(e.ElevObj.Dirn)
-        duration += TRAVEL_TIME
+        duration += config.TRAVEL_TIME
     }
 }
 
@@ -65,6 +52,7 @@ func DelegateOrder(elevMap variabletypes.AllElevatorInfo, structOfPeers variable
     listOfPeers := structOfPeers.Peers
     AllElevMap := utilities.CreateMapCopy(elevMap)
     currentId := config.InvalidId
+
     currentDuration := int(math.Inf(1))
     button := buttonEvent.Button
 
@@ -72,8 +60,8 @@ func DelegateOrder(elevMap variabletypes.AllElevatorInfo, structOfPeers variable
         return myID 
     }
     for id_int := range listOfPeers {
-
         id := strconv.Itoa(id_int)
+        
         currentElevator := AllElevMap[id]
         elevDuration := TimeToServeRequest(currentElevator, buttonEvent)
 
