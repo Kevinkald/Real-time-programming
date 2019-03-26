@@ -38,7 +38,7 @@ func main(){
 
 	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh,removeOrderCh,ordersCh,elevatorObjectCh,elevatorsCh)
 
-	go synchlogic.SynchronizeButtonLamps(elevatorsCh)
+	go synchlogic.SynchronizeButtonLamps(elevatorsCh,)
 
 	go elevio.PollButtons(buttonsCh)
 
