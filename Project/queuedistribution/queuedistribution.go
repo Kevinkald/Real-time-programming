@@ -57,10 +57,14 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			
 
 			// find best elevator to take order and set corresponding queue 
-			chosenElevator := costfunction.DelegateOrder(elevMap, p, b, msg.Id)
+			chosenElevator := costfunction.DelegateOrder(elevMap, p, b)
+
+
 			if chosenElevator == config.InvalidId {
-				fmt.Println("Error: invalid Id")
+				fmt.Println("Error: invalid Id, order lost")
 			}
+
+
 			var tmp = elevMap[chosenElevator]
 			tmp.OrderMatrix[b.Floor][b.Button] = true
 			elevMap[chosenElevator] = tmp

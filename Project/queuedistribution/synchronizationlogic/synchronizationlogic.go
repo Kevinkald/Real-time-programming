@@ -40,9 +40,8 @@ func Synchronize(	e_local variabletypes.AllElevatorInfo,
 					//If the local is the one having false
 					if (!e_local[elevid].OrderMatrix[floor][button]){
 						fmt.Println("synch logic: entered local one having the false")
-						//If local elev is also IDLE||OPEN, remove order if in that corresponding floor
-						if ((/*(e_local[elevid].ElevObj.State==variabletypes.IDLE)||*/
-							(e_local[elevid].ElevObj.State==variabletypes.OPEN))&&
+						//If local elev is also OPEN, remove order if in that corresponding floor
+						if ((e_local[elevid].ElevObj.State==variabletypes.OPEN)&&
 							(e_local[elevid].ElevObj.Floor==floor)){
 							fmt.Println("synch logic: remove order")
 							var tmp = e_synched[elevid]
@@ -52,8 +51,7 @@ func Synchronize(	e_local variabletypes.AllElevatorInfo,
 						} else {
 							elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, true)
 						}//If the received is the one having false
-					} else if((/*(e_received[elevid].ElevObj.State==variabletypes.IDLE)||*/
-							(e_received[elevid].ElevObj.State==variabletypes.OPEN))&&
+					} else if((e_received[elevid].ElevObj.State==variabletypes.OPEN)&&
 							(e_received[elevid].ElevObj.Floor==floor)){
 						fmt.Println("synch logic: entered received one having the false")
 						fmt.Println("synch logic: remove order")
