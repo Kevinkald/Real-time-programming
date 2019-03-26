@@ -5,7 +5,7 @@ import (
     "../../orderlogic"
     "../../config"
     "../utilities"
-    "math"
+    //"math"
     //"strconv"
     "fmt"
 )
@@ -30,9 +30,10 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
         case variabletypes.OPEN:
             duration -= config.DOOR_OPEN_TIME/2
     }
-
+    fmt.Println("cont after switch select state")
     for {
         if orderlogic.CheckForStop(e.ElevObj, e.OrderMatrix) {
+            fmt.Println("checkforstop finished")
             arrivedAtRequest, e := utilities.Requests_clearAtCurrentFloor(e, buttonEvnt)
 
             if arrivedAtRequest {
@@ -45,6 +46,7 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
 
         e.ElevObj.Floor += int(e.ElevObj.Dirn)
         duration += config.TRAVEL_TIME
+        fmt.Println("floor: ",e.ElevObj.Floor)
     }
 }
 
@@ -54,7 +56,8 @@ func DelegateOrder(elevMap variabletypes.AllElevatorInfo, structOfPeers variable
     AllElevMap := utilities.CreateMapCopy(elevMap)
     currentId := config.InvalidId
 
-    currentDuration := int(math.Inf(1))
+    //currentDuration := int(math.Inf(1))
+    currentDuration := 99999
     button := buttonEvent.Button
 
     fmt.Println("list of active nodes: ", listOfPeers)
@@ -78,7 +81,3 @@ func DelegateOrder(elevMap variabletypes.AllElevatorInfo, structOfPeers variable
     }
     return currentId
 }
-
-
-
-
