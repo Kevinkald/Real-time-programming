@@ -35,18 +35,19 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
         if orderlogic.CheckForStop(e.ElevObj, e.OrderMatrix) {
             fmt.Println("checkforstop finished")
             arrivedAtRequest, e := utilities.Requests_clearAtCurrentFloor(e, buttonEvnt)
-
+            fmt.Println("arrivedatrequest: ",arrivedAtRequest)
             if arrivedAtRequest {
+                fmt.Println("arrived at request in floor",e.ElevObj.Floor)
                 return duration
             }
 
             duration += config.DOOR_OPEN_TIME
             e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e.ElevObj, e.OrderMatrix)
         }
-
+        fmt.Println("floor1: ",e.ElevObj.Floor)
         e.ElevObj.Floor += int(e.ElevObj.Dirn)
         duration += config.TRAVEL_TIME
-        fmt.Println("floor: ",e.ElevObj.Floor)
+        fmt.Println("floor2: ",e.ElevObj.Floor)
     }
 }
 
