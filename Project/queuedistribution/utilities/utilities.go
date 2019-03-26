@@ -77,9 +77,11 @@ func Requests_clearAtCurrentFloor(e_old variabletypes.SingleElevatorInfo, button
     for btn := variabletypes.BT_HallUp; btn <= variabletypes.BT_Cab; btn ++ {
         if e.OrderMatrix[currentFloor][btn] == true {   // if there is an order 
             e.OrderMatrix[currentFloor][btn] = false;    // clear it
-            if (buttonEvnt.Floor == currentFloor) && (buttonEvnt.Button == btn) {
+            fmt.Println("oncleared: ", onCleared)
+            if (buttonEvnt.Floor == currentFloor)/* && (buttonEvnt.Button == btn)*/ {
             	onCleared = true
             }
+            fmt.Println("oncleared after if: ", onCleared)
         }
     } 
     return onCleared, e;

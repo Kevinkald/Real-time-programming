@@ -26,6 +26,7 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
         case variabletypes.MOVING:
             duration += config.TRAVEL_TIME/2
             e.ElevObj.Floor += int(e.ElevObj.Dirn)
+            //e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e.ElevObj, e.OrderMatrix)
             break;
         case variabletypes.OPEN:
             duration -= config.DOOR_OPEN_TIME/2
@@ -36,7 +37,7 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
             fmt.Println("checkforstop finished")
             arrivedAtRequest, e := utilities.Requests_clearAtCurrentFloor(e, buttonEvnt)
             fmt.Println("arrivedatrequest: ",arrivedAtRequest)
-            if arrivedAtRequest {
+            if (arrivedAtRequest) {
                 fmt.Println("arrived at request in floor",e.ElevObj.Floor)
                 return duration
             }
@@ -45,7 +46,20 @@ func TimeToServeRequest (e_old variabletypes.SingleElevatorInfo, buttonEvnt vari
             e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e.ElevObj, e.OrderMatrix)
         }
         fmt.Println("floor1: ",e.ElevObj.Floor)
+
+        /*floor := e.ElevObj.Floor
+        dir := e.ElevObj.Dirn
+
+        if (floor==0 && dir == -1) {
+            return duration
+        } else if (floor==config.N_Buttons && dir == 1){
+            return duration
+        }*/
+
         e.ElevObj.Floor += int(e.ElevObj.Dirn)
+
+        e.ElevObj.Dirn = orderlogic.ChooseNextDirection(e.ElevObj, e.OrderMatrix)
+
         duration += config.TRAVEL_TIME
         fmt.Println("floor2: ",e.ElevObj.Floor)
     }

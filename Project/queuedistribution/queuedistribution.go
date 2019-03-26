@@ -29,7 +29,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 	tmp.ElevObj.State = variabletypes.MOVING
 	elevMap[config.ElevatorId] = tmp
 	*/
-	ticker := time.NewTicker(time.Millisecond * 1000000)
+	ticker := time.NewTicker(time.Millisecond * 1000)
 	networkMessageTicker := time.NewTicker(time.Millisecond * 15)
 	orderChannelTicker := time.NewTicker(time.Millisecond * 100)
 
