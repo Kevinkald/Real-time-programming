@@ -88,17 +88,8 @@ func Requests_clearAtCurrentFloor(e_old variabletypes.SingleElevatorInfo, button
 }
 
 
-func ClearOrder(r int, tmp variabletypes.SingleElevatorInfo) {
+/*func ClearOrder(r int, tmp variabletypes.SingleElevatorInfo) {
     for button := 0; button < config.N_Buttons; button++ {
             tmp.OrderMatrix[r][button] = false      
     }
-}
-
-
-
-
-
-
-
-
-
+}*/
