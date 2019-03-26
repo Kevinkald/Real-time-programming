@@ -6,8 +6,8 @@ import(
 	"../config"
 	"../variabletypes"
 	"./utilities"
-	"../fsm/elevio"
-	"./synchronizationlogic"
+	//"../fsm/elevio"
+	"./synchlogic"
 	"./costfunction"
 )
 
@@ -17,7 +17,8 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 							ButtonsCh <-chan variabletypes.ButtonEvent,
 							removeOrderCh <-chan int,
 							ordersCh chan<- variabletypes.SingleOrderMatrix,
-		 					elevatorObjectCh <-chan variabletypes.ElevatorObject) {
+		 					elevatorObjectCh <-chan variabletypes.ElevatorObject,
+		 					elevatorsCh chan<- variabletypes.AllElevatorInfo) {
 
 
 	elevMap := utilities.InitMap()
@@ -69,30 +70,39 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			tmp.OrderMatrix[b.Floor][b.Button] = true
 			elevMap[chosenElevator] = tmp
 
-			elevio.SetButtonLamp(b.Button, b.Floor, true)
+			//elevio.SetButtonLamp(b.Button, b.Floor, true)
 
 			//Broadcast changes
 			msg.Info = utilities.CreateMapCopy(elevMap)
 			NetworkMessageBroadcastCh<- msg
 
+			
+			//if (len(p.Peers)== 0){
 			/*
-			if (len(p.Peers)== 0){
+			fmt.Println("button sending")
+			if (elevMap[config.ElevatorId].ElevObj.State != variabletypes.OPEN){
 				ordersCh <- elevMap[config.ElevatorId].OrderMatrix
-			}*/
+			}
+			fmt.Println("button sent")*/
+			//}
 
 
 		case n := <-networkMessageCh:
 
 			//fmt.Println(n)
-			elevMap = synchronizationlogic.Synchronize(elevMap,n.Info)
+			elevMap = synchlogic.Synchronize(elevMap,n.Info)
+
 			//Broadcast changes and print
 			//msg.Info := utilities.CreateMapCopy(elevMap)
 			//NetworkMessageBroadcastCh<- msg
 			//time.Sleep(1*time.Millisecond)
-
-			//ordersCh <- elevMap[config.ElevatorId].OrderMatrix
-
-
+			/*
+			fmt.Println("net sending")
+			if (elevMap[config.ElevatorId].ElevObj.State != variabletypes.OPEN){
+				ordersCh <- elevMap[config.ElevatorId].OrderMatrix
+			}
+			fmt.Println("net sent")
+			*/
 			//Only synch if the received message is not sent by this node
 			//if (n.Id!=config.ElevatorId){
 				//ordersCh <- elevMap[config.ElevatorId].OrderMatrix
@@ -112,7 +122,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 
 			for button := 0; button < config.N_Buttons; button++{
 				tmp.OrderMatrix[r][button] = false
-				elevio.SetButtonLamp(variabletypes.ButtonType(button), r, false)
+				//elevio.SetButtonLamp(variabletypes.ButtonType(button), r, false)
 			}
 			elevMap[config.ElevatorId] = tmp
 
@@ -133,10 +143,11 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			NetworkMessageBroadcastCh<- msg
 			time.Sleep(1*time.Millisecond)	
 		case <-orderChannelTicker.C:
-			ordersCh <- elevMap[config.ElevatorId].OrderMatrix
-
+			if (elevMap[config.ElevatorId].ElevObj.State != variabletypes.OPEN){
+				ordersCh <- elevMap[config.ElevatorId].OrderMatrix
+			}
+			elevators := utilities.CreateMapCopy(elevMap)
+			elevatorsCh<- elevators
 		}
 	}
 }
-
-

@@ -18,8 +18,8 @@ const (
 	N_Buttons int = 3
 	N_Elevators int = 2
 
-	PeerPort int = 20012
-	BroadcastPort int = 30012
+	PeerPort int = 17563
+	BroadcastPort int = 17564
 
 
 	TRAVEL_TIME int = 3 

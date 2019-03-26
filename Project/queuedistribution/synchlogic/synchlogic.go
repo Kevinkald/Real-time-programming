@@ -1,4 +1,4 @@
-package synchronizationlogic
+package synchlogic
 
 import(
 	"../../variabletypes"
@@ -6,6 +6,7 @@ import(
 	"../utilities"
 	"fmt"
 	"../../fsm/elevio"
+	"time"
 )
 
 func Synchronize(	e_local variabletypes.AllElevatorInfo,
@@ -47,10 +48,10 @@ func Synchronize(	e_local variabletypes.AllElevatorInfo,
 							var tmp = e_synched[elevid]
 							tmp.OrderMatrix[floor][button] = false
 							e_synched[elevid] = tmp 
-							elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, false)
-						} else {
-							elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, true)
-						}//If the received is the one having false
+							//elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, false)
+						}
+							//elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, true)
+						//If the received is the one having false
 					} else if((e_received[elevid].ElevObj.State==variabletypes.OPEN)&&
 							(e_received[elevid].ElevObj.Floor==floor)){
 						fmt.Println("synch logic: entered received one having the false")
@@ -58,14 +59,37 @@ func Synchronize(	e_local variabletypes.AllElevatorInfo,
 						var tmp = e_synched[elevid]
 						tmp.OrderMatrix[floor][button] = false
 						e_synched[elevid] = tmp 
-						elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, false)
-					} else {
-						elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, true)
+						//elevio.SetButtonLamp(variabletypes.ButtonType(button), floor, false)
 					}
 				}
 			}
 		}
 	}
-
 	return e_synched
+}
+
+func SynchronizeButtonLamps(elevatorsCh <-chan variabletypes.AllElevatorInfo,peerUpdateCh <-chan variabletypes.Peers){
+	var peers variabletypes.Peers
+	for {
+		select {
+			case elevators := <-elevatorsCh:
+			for _,id := range peers {
+				for floor := 0; floor < config.N_Floors; floor++{
+					for btn := variabletypes.BT_HallUp; btn <= variabletypes.BT_Cab; btn++{
+						if (btn != variabletypes.BT_Cab || id == config.ElevatorId){
+							if (elevators[id].OrderMatrix[floor][btn]) {
+								elevio.SetButtonLamp(variabletypes.ButtonType(btn), floor, true)
+							} else {
+								elevio.SetButtonLamp(variabletypes.ButtonType(btn), floor, false)
+							}
+						}
+					}
+				}
+			}
+			time.Sleep(20*time.Millisecond)
+			case p := <-peerUpdateCh:
+		}
+	}
+		
+		
 }
