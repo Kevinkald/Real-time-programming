@@ -79,9 +79,9 @@ func SynchronizeButtonLamps(elevatorsCh <-chan variabletypes.AllElevatorInfo,
                         order := false
                         for _,id := range peers.Peers { // for all alive elevators
                             if (elevators[id].OrderMatrix[floor][btn]) { // if there is an order
-                                order = true
-                                if (btn == variabletypes.BT_Cab) && (id != config.ElevatorId ) { // if it is a cabcall and not you id
-                                    order = false
+                               	//order = true
+                                if (btn != variabletypes.BT_Cab)|| (id == config.ElevatorId ) { // if it's not a cabcall or it is your id
+                                    order = true
                                 }
                             }
                         }

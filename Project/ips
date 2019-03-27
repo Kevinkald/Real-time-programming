@@ -1,0 +1,21 @@
+Labplass 21: 10.100.23.168
+
+Labplass 19: 10.100.23.140
+
+Connect: ssh student@10.100.23.140
+----------------------------
+Copying folder ttk4145 from remote computer @ the given ip to our computer at Real-time..
+Run at our computer.
+
+sudo scp -r student@10.100.23.176:~/ttk4145 ~/Real-time-programming
+
+
+
+Copy from host to remote at given ip.
+
+
+
+FINAL PROCEDURE:
+
+ssh student@10.100.23.140
+sudo scp -r ~/Real-time-programming/Project student@10.100.23.140:~/ttk4145

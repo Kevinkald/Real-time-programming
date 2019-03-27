@@ -7,6 +7,7 @@ import (
 	"sort"
 	"time"
 	"../../variabletypes"
+	"../../config"
 )
 
 const interval = 15 * time.Millisecond
@@ -72,6 +73,10 @@ func Receiver(port int, peerUpdateCh chan<- variabletypes.PeerUpdate) {
 
 			for k, _ := range lastSeen {
 				p.Peers = append(p.Peers, k)
+			}
+
+			if len(p.Peers) ==0{
+				p.Peers = append(p.Peers,config.ElevatorId)
 			}
 
 			sort.Strings(p.Peers)
