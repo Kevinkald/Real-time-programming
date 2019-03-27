@@ -44,7 +44,7 @@ func CalculateCost(elevator variabletypes.SingleElevatorInfo, buttonEvent variab
 
     orders := elevator.OrderMatrix
     currentfloor := elevator.ElevObj.Floor
-    //motordirection := elevator.ElevObj.Dirn
+    motordirection := elevator.ElevObj.Dirn
     //state := elevator.ElevObj.State
     orderedfloor := buttonEvent.Floor
 
