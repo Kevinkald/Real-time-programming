@@ -1,0 +1,12 @@
+Possible errors:
+- Are we reading messages fast enough?
+		if not, msgs are being piled up on the reciever end. If we have a buffer of size x, then after the pile of msgs reach x the messages wont be read. 
+		Buffered Channels:
+	Buffered channels can be created by passing an additional capacity parameter to the make function which specifies the size of the buffer.
+
+	ch := make(chan type, capacity
+- Running mutiple simulations from one computer
+- In prev version: reassigning value of e in cos delegation!!
+- Sending a lot of messages to lamp oss from synchronizebuttonlight
+- Lamp not working optimally in 4.th floor
+- const timeout = 100 * time.Millisecond  turn it up!!!!

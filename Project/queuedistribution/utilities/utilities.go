@@ -39,35 +39,6 @@ func PrintMap(a variabletypes.AllElevatorInfo){
 		//time.Sleep(200*time.Millisecond)
 }
 
-/*
-func IfEqual(requestedButton variabletypes.ButtonType, requestedFloor variabletypes.ButtonType, currentState variabletypes.ElevatorObject) bool {
-	currentState.Floor := inner_f
-	// currentState.Button := inner_b
-
-	if inner_b == requestedButton && inner_f == requestedFloor {
-        return true
-    }
-    return false
-}
-
-func Requests_clearAtCurrentFloor(e_old variabletypes.SingleElevatorInfo, buttonEvnt variabletypes.ButtonEvent, onClearedRequest func(requestedButton variabletypes.ButtonType, requestedFloor variabletypes.ButtonType, currentState variabletypes.ElevatorObject) int) (int, variabletypes.SingleElevatorInfo) {
-    var e variabletypes.SingleElevatorInfo = e_old
-    currentFloor := e.ElevObj.Floor
-
-    var btn variabletypes.ButtonEvent := 0
-    onCleared := false
-
-    for btn = 0; btn < config.N_Buttons; btn ++ {
-        if e.OrderMatrix[currentFloor][btn] = true {   // if there is an order 
-            e.OrderMatrix[currentFloor][btn] = false;    // clear it
-            onCleared = onClearedRequest(btn, buttonEvnt.Floor, e.ElevObj))
-        }
-    } 
-    return onCleared, e;
-}
-
-*/
-
 func Requests_clearAtCurrentFloor(e_old variabletypes.SingleElevatorInfo, buttonEvnt variabletypes.ButtonEvent) (bool, variabletypes.SingleElevatorInfo) {
     var e variabletypes.SingleElevatorInfo = e_old
     currentFloor := e.ElevObj.Floor
@@ -87,18 +58,10 @@ func Requests_clearAtCurrentFloor(e_old variabletypes.SingleElevatorInfo, button
     return onCleared, e;
 }
 
-
+/*
 func ClearOrder(r int, tmp variabletypes.SingleElevatorInfo) {
     for button := 0; button < config.N_Buttons; button++ {
             tmp.OrderMatrix[r][button] = false      
     }
 }
-
-
-
-
-
-
-
-
-
+*/

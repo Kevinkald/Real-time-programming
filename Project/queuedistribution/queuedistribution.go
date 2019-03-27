@@ -6,8 +6,8 @@ import(
 	"../config"
 	"../variabletypes"
 	"./utilities"
-	"../fsm/elevio"
-	"./synchronizationlogic"
+	//"../fsm/elevio"
+	"./synchlogic"
 	"./costfunction"
 )
 
@@ -17,18 +17,12 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 							ButtonsCh <-chan variabletypes.ButtonEvent,
 							removeOrderCh <-chan int,
 							ordersCh chan<- variabletypes.SingleOrderMatrix,
-		 					elevatorObjectCh <-chan variabletypes.ElevatorObject) {
+		 					elevatorObjectCh <-chan variabletypes.ElevatorObject,
+		 					elevatorsCh chan<- variabletypes.AllElevatorInfo) {
 
 
 	elevMap := utilities.InitMap()
 
-	/*Just to check if elev obj syncs up
-	var tmp = elevMap[config.ElevatorId]
-	tmp.ElevObj.Floor = 2
-	tmp.ElevObj.Dirn = 	variabletypes.MD_Up
-	tmp.ElevObj.State = variabletypes.MOVING
-	elevMap[config.ElevatorId] = tmp
-	*/
 	ticker := time.NewTicker(time.Millisecond * 1000)
 	networkMessageTicker := time.NewTicker(time.Millisecond * 15)
 	orderChannelTicker := time.NewTicker(time.Millisecond * 100)
@@ -54,61 +48,31 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 
 		case b:= <-ButtonsCh:
 			fmt.Println("Pushed button: {floor,type} ", b)
-			
 
 			// find best elevator to take order and set corresponding queue 
-			chosenElevator := costfunction.DelegateOrder(elevMap, p, b, msg.Id)
+			chosenElevator := costfunction.DelegateOrder(elevMap, p, b)
 			if chosenElevator == config.InvalidId {
-				fmt.Println("Error: invalid Id")
+				fmt.Println("Error: invalid Id, order lost")
 			}
-			var tmp = elevMap[chosenElevator]
+
+			// is there any ay to make this look nicer???
+			tmp := elevMap[chosenElevator]
 			tmp.OrderMatrix[b.Floor][b.Button] = true
 			elevMap[chosenElevator] = tmp
-
-			elevio.SetButtonLamp(b.Button, b.Floor, true)
 
 			//Broadcast changes
 			msg.Info = utilities.CreateMapCopy(elevMap)
 			NetworkMessageBroadcastCh<- msg
 
-			/*
-			if (len(p.Peers)== 0){
-				ordersCh <- elevMap[config.ElevatorId].OrderMatrix
-			}*/
-
-
 		case n := <-networkMessageCh:
+			elevMap = synchlogic.Synchronize(elevMap,n.Info)
 
-			//fmt.Println(n)
-			elevMap = synchronizationlogic.Synchronize(elevMap,n.Info)
-			//Broadcast changes and print
-			//msg.Info := utilities.CreateMapCopy(elevMap)
-			//NetworkMessageBroadcastCh<- msg
-			//time.Sleep(1*time.Millisecond)
-
-			//ordersCh <- elevMap[config.ElevatorId].OrderMatrix
-
-
-			//Only synch if the received message is not sent by this node
-			//if (n.Id!=config.ElevatorId){
-				//ordersCh <- elevMap[config.ElevatorId].OrderMatrix
-			//}
-			
-			//Broadcast changes and print 						NB: This should be done after given time intervals
-
-			//msg.Info = utilities.CreateMapCopy(elevMap)
-			//NetworkMessageBroadcastCh<- msg
-			//time.Sleep(1*time.Millisecond)
-
-			//Make nicer!
-		
 		case r := <-removeOrderCh:
 			//todo: make this nicer
-			var tmp = elevMap[config.ElevatorId]
+			tmp := elevMap[config.ElevatorId]
 
 			for button := 0; button < config.N_Buttons; button++{
 				tmp.OrderMatrix[r][button] = false
-				elevio.SetButtonLamp(variabletypes.ButtonType(button), r, false)
 			}
 			elevMap[config.ElevatorId] = tmp
 
@@ -117,7 +81,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			NetworkMessageBroadcastCh<- msg
 		
 		case q := <-elevatorObjectCh:
-			var tmp = elevMap[config.ElevatorId]
+			tmp := elevMap[config.ElevatorId]
 			tmp.ElevObj = q
 			elevMap[config.ElevatorId] = tmp
 
@@ -129,10 +93,11 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			NetworkMessageBroadcastCh<- msg
 			time.Sleep(1*time.Millisecond)	
 		case <-orderChannelTicker.C:
-			ordersCh <- elevMap[config.ElevatorId].OrderMatrix
-
+			if (elevMap[config.ElevatorId].ElevObj.State != variabletypes.OPEN){
+				ordersCh <- elevMap[config.ElevatorId].OrderMatrix
+			}
+			elevators := utilities.CreateMapCopy(elevMap)
+			elevatorsCh<- elevators
 		}
 	}
 }
-
-

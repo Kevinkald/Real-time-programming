@@ -17,7 +17,6 @@ var _mtx sync.Mutex
 var _conn net.Conn
 
 func Init(addr string) {
-	///*, */
 	time.Sleep(time.Second * 3)
 	(exec.Command("gnome-terminal", "-x", "sh", "-c", "Simulator-v2/./SimElevatorServer --port "+config.ElevatorPort)).Run()
 	time.Sleep(time.Second * 2)
@@ -27,6 +26,8 @@ func Init(addr string) {
 		fmt.Println("Driver already initialized!")
 		return
 	}
+
+	//only one goroutine can access a variable at a time
 	_mtx = sync.Mutex{}
 	var err error
 	_conn, err = net.Dial("tcp", addr)
