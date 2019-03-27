@@ -8,6 +8,7 @@ import (
     //"math"
     //"strconv"
     //"fmt"
+    "math"
 )
 
 func DelegateOrder( elevMap variabletypes.AllElevatorInfo, 
@@ -43,15 +44,15 @@ func CalculateCost(elevator variabletypes.SingleElevatorInfo, buttonEvent variab
 
     orders := elevator.OrderMatrix
     currentfloor := elevator.ElevObj.Floor
-    motordirection := elevator.ElevObj.Dirn
+    //motordirection := elevator.ElevObj.Dirn
     //state := elevator.ElevObj.State
     orderedfloor := buttonEvent.Floor
 
     cost := 0
 
     //Punish distance to order
-    difference := (currentfloor-orderedfloor)*int(motordirection)*int(motordirection)
-    cost += difference * 10
+    //difference := (currentfloor-orderedfloor)*int(motordirection)*int(motordirection)
+    //cost += difference * 10
 
     //Punish # orders
     for floor := 0; floor < config.N_Floors; floor++{
@@ -70,7 +71,7 @@ func CalculateCost(elevator variabletypes.SingleElevatorInfo, buttonEvent variab
         cost += 10*difference
     }*/
 
-    if (motordirection==variabletypes.MD_Up){
+    /*if (motordirection==variabletypes.MD_Up){
         if (int(currentfloor)+int(motordirection) > orderedfloor){
             cost += 10*difference
         }
@@ -78,7 +79,9 @@ func CalculateCost(elevator variabletypes.SingleElevatorInfo, buttonEvent variab
         if (int(currentfloor)+int(motordirection) < orderedfloor){
             cost += 10*difference
         }
-    }
+    }*/
+
+    cost += int(math.Abs(float64(currentfloor-orderedfloor))*10)
 
     return cost
 }
