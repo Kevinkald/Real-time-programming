@@ -50,7 +50,7 @@ func CalculateCost(elevator variabletypes.SingleElevatorInfo, buttonEvent variab
     cost := 0
 
     //Punish distance to order
-    difference := (currentfloor-orderedfloor)*int(motordirection)
+    difference := (currentfloor-orderedfloor)*int(motordirection)*int(motordirection)
     cost += difference * 10
 
     //Punish # orders
@@ -67,9 +67,18 @@ func CalculateCost(elevator variabletypes.SingleElevatorInfo, buttonEvent variab
     //Punish direction
     //If the order is in the opposite direction punish!
     if (int(currentfloor) + int(motordirection) > orderedfloor){
-        cost += 10
+        cost += 10*difference
     }
 
+    if (motordirection==variabletypes.MD_Up){
+        if (int(currentfloor)+int(motordirection) > orderedfloor){
+            cost += 10*difference
+        }
+    } else if (motordirection==variabletypes.MD_Down){
+        if (int(currentfloor)+int(motordirection) < orderedfloor){
+            cost += 10*difference
+        }
+    }
 
     return cost
 }

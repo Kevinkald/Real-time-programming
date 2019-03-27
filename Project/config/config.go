@@ -16,7 +16,7 @@ const (
 	InvalidId string = "0"
 	N_Floors int = 4
 	N_Buttons int = 3
-	N_Elevators int = 2
+	N_Elevators int = 3
 
 	PeerPort int = 17563
 	BroadcastPort int = 17564

@@ -7,6 +7,8 @@ import(
 	"../config"
 	"../orderlogic"
 	"../variabletypes"
+	"os"
+	"os/exec"
 )
 
 
@@ -125,8 +127,9 @@ func fsmElevatorStuckTimeOut(){
 	fmt.Println("****************   ELEVATOR ENGINE ERROR!   ****************")
 	fmt.Println("****************   RESTART ELEVATOR %d      ****************", config.ElevatorId)
 	elevio.SetMotorDirection(variabletypes.MD_Stop)
-	time.Sleep(time.Second * 1)
-	//os.Exit(1)
+	//time.Sleep(time.Second * 1)
+	(exec.Command("gnome-terminal", "-x", "sh", "-c", "go run main.go "+config.ElevatorId+" "+config.ElevatorPort)).Run()
+	os.Exit(1)
 }
 
 func fsmDoorTimer(doorTimerResetCh <-chan bool, doorTimerOutCh chan<- bool){

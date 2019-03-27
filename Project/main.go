@@ -21,22 +21,22 @@ func main(){
 	elevio.Init("localhost:" + config.ElevatorPort)
 
 	//Channels between Queuedistributor and Network module
-	peerUpdateCh := make(chan variabletypes.PeerUpdate)
-	networkMessageCh := make(chan variabletypes.NetworkMsg)
-	networkMessageBroadcastCh := make(chan variabletypes.NetworkMsg)
+	peerUpdateCh := make(chan variabletypes.PeerUpdate,10)
+	networkMessageCh := make(chan variabletypes.NetworkMsg,10)
+	networkMessageBroadcastCh := make(chan variabletypes.NetworkMsg,10)
 
 	//Channel between FSM and Queuedistributor module
-	ordersCh := make(chan variabletypes.SingleOrderMatrix)
-	elevatorObjectCh := make(chan variabletypes.ElevatorObject)
-	removeOrderCh := make(chan int)
+	ordersCh := make(chan variabletypes.SingleOrderMatrix,10)
+	elevatorObjectCh := make(chan variabletypes.ElevatorObject,10)
+	removeOrderCh := make(chan int,10)
 
 
 	//Channel between Buttons and Queuedistributor module
-	buttonsCh := make(chan variabletypes.ButtonEvent)
+	buttonsCh := make(chan variabletypes.ButtonEvent,10)
 
 	//Ch buttons
-	elevatorsCh := make(chan variabletypes.AllElevatorInfo)
-	alivePeersCh := make(chan variabletypes.PeerUpdate)
+	elevatorsCh := make(chan variabletypes.AllElevatorInfo,10)
+	alivePeersCh := make(chan variabletypes.PeerUpdate,10)
 
 	go network.Network(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
 
