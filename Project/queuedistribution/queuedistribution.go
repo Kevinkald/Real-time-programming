@@ -18,7 +18,8 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 							removeOrderCh <-chan int,
 							ordersCh chan<- variabletypes.SingleOrderMatrix,
 		 					elevatorObjectCh <-chan variabletypes.ElevatorObject,
-		 					elevatorsCh chan<- variabletypes.AllElevatorInfo) {
+		 					elevatorsCh chan<- variabletypes.AllElevatorInfo,
+		 					alivePeersCh chan<- variabletypes.PeerUpdate) {
 
 
 	elevMap := utilities.InitMap()
@@ -49,8 +50,18 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 	for {
 		select{
 		case new_p := <-peerUpdateCh: 
-			p = new_p
+			received_p := new_p
+			if (len(received_p.Peers)!=len(p.Peers)){
+				redistributed_orders := redistributeOrders(received_p,elevMap)
+				elevMap = redistributed_orders
+			}
+			p = received_p
+
 			fmt.Println("Current alive nodes:",p.Peers)
+
+			alivePeersCh <- p
+
+
 
 		case b:= <-ButtonsCh:
 			fmt.Println("Pushed button: {floor,type} ", b)
@@ -149,4 +160,25 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			elevatorsCh<- elevators
 		}
 	}
+}
+
+func redistributeOrders( peers variabletypes.PeerUpdate,
+						 elevMap variabletypes.AllElevatorInfo)variabletypes.AllElevatorInfo{
+	redistMap := utilities.CreateMapCopy(elevMap)
+	var redistributedOrder variabletypes.ButtonEvent
+	for _,lostElevatorId := range peers.Lost {
+		for floor := 0; floor < config.N_Floors; floor++{
+			redistributedOrder.Floor = floor
+			for btn := variabletypes.BT_HallUp; btn <= variabletypes.BT_HallDown; btn++{
+				redistributedOrder.Button = btn
+				if (elevMap[lostElevatorId].OrderMatrix[floor][btn]){
+					new_id := costfunction.DelegateOrder(elevMap, peers, redistributedOrder)
+					tmp := redistMap[new_id]
+					tmp.OrderMatrix[floor][btn] = true
+					redistMap[new_id] = tmp
+				}
+			}
+		}
+	}
+	return redistMap
 }

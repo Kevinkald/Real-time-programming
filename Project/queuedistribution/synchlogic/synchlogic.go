@@ -68,28 +68,34 @@ func Synchronize(	e_local variabletypes.AllElevatorInfo,
 	return e_synched
 }
 
-func SynchronizeButtonLamps(elevatorsCh <-chan variabletypes.AllElevatorInfo,peerUpdateCh <-chan variabletypes.Peers){
-	var peers variabletypes.Peers
-	for {
-		select {
-			case elevators := <-elevatorsCh:
-			for _,id := range peers {
-				for floor := 0; floor < config.N_Floors; floor++{
-					for btn := variabletypes.BT_HallUp; btn <= variabletypes.BT_Cab; btn++{
-						if (btn != variabletypes.BT_Cab || id == config.ElevatorId){
-							if (elevators[id].OrderMatrix[floor][btn]) {
-								elevio.SetButtonLamp(variabletypes.ButtonType(btn), floor, true)
-							} else {
-								elevio.SetButtonLamp(variabletypes.ButtonType(btn), floor, false)
-							}
-						}
-					}
-				}
-			}
-			time.Sleep(20*time.Millisecond)
-			case p := <-peerUpdateCh:
-		}
-	}
-		
-		
+func SynchronizeButtonLamps(elevatorsCh <-chan variabletypes.AllElevatorInfo,
+							alivePeersCh <-chan variabletypes.PeerUpdate){
+    var peers variabletypes.PeerUpdate
+    for {
+        select {
+            case elevators := <-elevatorsCh:
+                for floor := 0; floor < config.N_Floors; floor++{ // for all floors
+                    for btn := variabletypes.BT_HallUp; btn <= variabletypes.BT_Cab; btn++{ // and all buttons
+                        order := false
+                        for _,id := range peers.Peers { // for all alive elevators
+                            if (elevators[id].OrderMatrix[floor][btn]) { // if there is an order
+                                order = true
+                                if (btn == variabletypes.BT_Cab) && (id != config.ElevatorId ) { // if it is a cabcall and not you id
+                                    order = false
+                                }
+                            }
+                        }
+                        if (order) {
+                            elevio.SetButtonLamp(variabletypes.ButtonType(btn), floor, true)
+                        } else {
+                            elevio.SetButtonLamp(variabletypes.ButtonType(btn), floor, false)
+                            }
+                    }
+                }
+                time.Sleep(20*time.Millisecond)
+            case p := <-alivePeersCh:
+            	peers = p
+        }
+            
+    }
 }

@@ -29,16 +29,20 @@ func main(){
 	ordersCh := make(chan variabletypes.SingleOrderMatrix)
 	elevatorObjectCh := make(chan variabletypes.ElevatorObject)
 	removeOrderCh := make(chan int)
-	elevatorsCh := make(chan variabletypes.AllElevatorInfo)
+
 
 	//Channel between Buttons and Queuedistributor module
 	buttonsCh := make(chan variabletypes.ButtonEvent)
 
+	//Ch buttons
+	elevatorsCh := make(chan variabletypes.AllElevatorInfo)
+	alivePeersCh := make(chan variabletypes.PeerUpdate)
+
 	go network.Network(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
 
-	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh,removeOrderCh,ordersCh,elevatorObjectCh,elevatorsCh)
+	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh,removeOrderCh,ordersCh,elevatorObjectCh,elevatorsCh,alivePeersCh)
 
-	go synchlogic.SynchronizeButtonLamps(elevatorsCh,)
+	go synchlogic.SynchronizeButtonLamps(elevatorsCh,alivePeersCh)
 
 	go elevio.PollButtons(buttonsCh)
 
