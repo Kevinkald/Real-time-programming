@@ -48,7 +48,9 @@ func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 		case msg1 := <-ordersCh:
 			singleElevatorOrders = msg1
 			fsmNewOrder(doorTimerResetCh, elevatorStuckTimerResetCh)
+			fmt.Println("received orders(FSM)")
 			elevatorObjectCh <- singleElevator
+			fmt.Println("sent ElevObj (FSM)")
 
 		case msg2 := <-reachedFloorCh:
 			singleElevator.Floor = msg2
@@ -100,6 +102,9 @@ func fsmDoorTimeOut(removeOrderCh chan<- int, elevatorStuckTimerResetCh chan<- b
 	switch singleElevator.State {
 	case variabletypes.OPEN:
 		fmt.Println("Closing doors")
+		for btn := 0; btn < config.N_Buttons; btn++{
+			singleElevatorOrders[singleElevator.Floor][btn] = false
+		}
 		removeOrderCh <- singleElevator.Floor
 		fmt.Println("Order removed")
 		elevio.SetDoorOpenLamp(false)

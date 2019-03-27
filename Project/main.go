@@ -10,6 +10,7 @@ import(
 	"./fsm/elevio"
 	//"./fsm/fsmdummy"
 	"./fsm"
+	"./queuedistribution/synchlogic"
 )
 
 func main(){
@@ -28,13 +29,16 @@ func main(){
 	ordersCh := make(chan variabletypes.SingleOrderMatrix)
 	elevatorObjectCh := make(chan variabletypes.ElevatorObject)
 	removeOrderCh := make(chan int)
+	elevatorsCh := make(chan variabletypes.AllElevatorInfo)
 
 	//Channel between Buttons and Queuedistributor module
 	buttonsCh := make(chan variabletypes.ButtonEvent)
 
 	go network.Network(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
 
-	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh,removeOrderCh,ordersCh,elevatorObjectCh)
+	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh,removeOrderCh,ordersCh,elevatorObjectCh,elevatorsCh)
+
+	go synchlogic.SynchronizeButtonLamps(elevatorsCh,)
 
 	go elevio.PollButtons(buttonsCh)
 
