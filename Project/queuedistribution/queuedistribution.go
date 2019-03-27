@@ -47,7 +47,6 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 
 	for {
 		select{
-			//WHY DOES THIS FLICKER WHEN PRINTING??
 		case new_p := <-peerUpdateCh: 
 			p = new_p
 			fmt.Println("Current alive nodes:",p.Peers)
