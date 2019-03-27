@@ -51,7 +51,7 @@ func CalculateCost(elevator variabletypes.SingleElevatorInfo, buttonEvent variab
     cost := 0
 
     //Punish distance to order
-    difference := int(math.Abs(float64(currentfloor-orderedfloor))
+    difference := int(math.Abs(float64(currentfloor-orderedfloor)))
     cost += difference*10
     //cost += difference * 10
 
