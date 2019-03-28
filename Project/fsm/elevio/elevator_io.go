@@ -20,7 +20,7 @@ func Init(addr string) {
 	///*, */
 	time.Sleep(time.Second * 3)
 	//(exec.Command("gnome-terminal", "-x", "sh", "-c", "Simulator-v2/./SimElevatorServer --port "+config.ElevatorPort)).Run()
-	(exec.Command("gnome-terminal", "-x", "sh", "-c", "ElevatorServer")).Run()
+	(exec.Command("gnome-terminal", "-x", "sh", "-c", "elevator-server/./ElevatorServer")).Run()
 	time.Sleep(time.Second * 2)
 
 
