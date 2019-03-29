@@ -1,6 +1,7 @@
 package config
 import "os"
 import "fmt"
+import "time"
 
 var ElevatorPort string
 var ElevatorId string
@@ -13,6 +14,9 @@ func ConfigInit(){
 }
 
 const (
+	//Interval and timeout in ms
+	INTERVAL = 15*time.Millisecond
+	TIMEOUT = 1000*time.Millisecond
 	InvalidId string = "0"
 	N_Floors int = 4
 	N_Buttons int = 3

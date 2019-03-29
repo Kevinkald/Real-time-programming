@@ -2,33 +2,23 @@ package network
 
 import (
 	"./bcast"
-	//"./localip"
 	"./peers"
 	"../variabletypes"
-	//"flag"
-	//"fmt"
-	//"os"
-	//"time"
-	//"strings"
 	"../config"
 )
 
 func Network(	peerUpdateCh chan<- variabletypes.PeerUpdate, 
-				NetworkMessageCh chan<-  variabletypes.NetworkMsg,
-				NetworkMessageBroadcastCh <-chan  variabletypes.NetworkMsg) {
+				networkMessageCh chan<-  variabletypes.NetworkMsg,
+				networkMessageBroadcastCh <-chan  variabletypes.NetworkMsg) {
 
 	// We can disable/enable the transmitter after it has been started.
-	// This could be used to signal that we are somehow "unavailable".
 	peerTxEnable := make(chan bool)
 
-	//Start transmitting the elevator id to port
+	// Start transmitting and receiving peers
 	go peers.Transmitter(config.PeerPort, config.ElevatorId, peerTxEnable)
-	//Pass received network messages to peerUpdateCh
 	go peers.Receiver(config.PeerPort, peerUpdateCh)
 
-	//Start broadcasting messages received on NetworkMessageBroadcastCh
-	go bcast.Transmitter(config.BroadcastPort, NetworkMessageBroadcastCh)
-	//Pass received networkmessages to NetWorkMessageCh
-	go bcast.Receiver(config.BroadcastPort, NetworkMessageCh)
+	// Start transmitting and receiving elevator data
+	go bcast.Transmitter(config.BroadcastPort, networkMessageBroadcastCh)
+	go bcast.Receiver(config.BroadcastPort, networkMessageCh)
 }
-// ikke send videre mld om det er din egen, dvs. endre mldtype
