@@ -2,87 +2,71 @@ package costfunction
 
 import (
     "../../variabletypes"
-    //"../../orderlogic"
     "../../config"
-    //"../utilities"
-    //"math"
-    //"strconv"
-    //"fmt"
     "math"
 )
 
 func DelegateOrder( elevMap variabletypes.AllElevatorInfo, 
-                    PeerInfo variabletypes.PeerUpdate, 
+                    peerInfo variabletypes.PeerUpdate, 
                     buttonEvent variabletypes.ButtonEvent) string {
     
-    //It its a cab call delegate to this elevator
-    if (buttonEvent.Button==variabletypes.BT_Cab){
+    if (buttonEvent.Button==variabletypes.BTCab){
         return config.ElevatorId
     }
 
-    peers := PeerInfo.Peers
+    peers := peerInfo.Peers
     costs := make(map[string]int)
 
-    for _,Peer := range peers{
-        costs[Peer] = CalculateCost(elevMap[Peer], buttonEvent)
+    for _,peer := range peers{
+        costs[peer] = calculateCost(elevMap[peer], buttonEvent)
     }
 
-    bestoption := "InvalidId"
-    bestoptioncost := 9999
+    optimalElevator := config.InvalidId
+    optimalElevatorCost := 9999
 
-    for id, cost := range costs{
-        if (cost <= bestoptioncost){
-            bestoptioncost = cost
-            bestoption = id
+    for elevId, cost := range costs{
+        if (cost <= optimalElevatorCost){
+            optimalElevatorCost = cost
+            optimalElevator = elevId
         }
     }
 
-    return bestoption
+    return optimalElevator
 }
 
-func CalculateCost(elevator variabletypes.SingleElevatorInfo, buttonEvent variabletypes.ButtonEvent) int{
+func calculateCost( elevator variabletypes.SingleElevatorInfo,
+                    buttonEvent variabletypes.ButtonEvent) int{
 
     orders := elevator.OrderMatrix
-    currentfloor := elevator.ElevObj.Floor
-    motordirection := elevator.ElevObj.Dirn
-    //state := elevator.ElevObj.State
-    orderedfloor := buttonEvent.Floor
+    currentFloor := elevator.ElevObj.Floor
+    motorDirection := elevator.ElevObj.Dirn
+    orderedFloor := buttonEvent.Floor
 
     cost := 0
 
     //Punish distance to order
-    difference := int(math.Abs(float64(currentfloor-orderedfloor)))
-    cost += difference*10
-    //cost += difference * 10
+    floorDifference := int(math.Abs(float64(currentFloor-orderedFloor)))
+    cost += floorDifference*10
 
     //Punish # orders
-    for floor := 0; floor < config.N_Floors; floor++{
-
-        for button := 0; button < config.N_Buttons; button++{
-
+    for floor := 0; floor < config.NFloors; floor++{
+        for button := 0; button < config.NButtons; button++{
             if (orders[floor][button]){
                 cost += 10
             }
         }
     }
 
-    //Punish direction
-    //If the order is in the opposite direction punish!
-    /*if (int(currentfloor) + int(motordirection) > orderedfloor){
-        cost += 10*difference
-    }*/
-
-    if (motordirection==variabletypes.MD_Up){
-        if (int(currentfloor)+int(motordirection) > orderedfloor){
-            cost += 10/2*difference
+    //Punish wrong motor direction
+    if (motorDirection==variabletypes.MDUp){
+        if (int(currentFloor)+int(motorDirection) > orderedFloor){
+            cost += 10/2*floorDifference
         }
-    } else if (motordirection==variabletypes.MD_Down){
-        if (int(currentfloor)+int(motordirection) < orderedfloor){
-            cost += 10/2*difference
+    } else if (motorDirection==variabletypes.MDDown){
+        if (int(currentFloor)+int(motorDirection) < orderedFloor){
+            cost += 10/2*floorDifference
         }
     }
-
- 
 
     return cost
 }

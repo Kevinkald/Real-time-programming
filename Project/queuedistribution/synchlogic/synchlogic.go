@@ -27,9 +27,9 @@ func Synchronize(	e_local variabletypes.AllElevatorInfo,
 
 		//2. Synchronize queues
 		//Loop through all elements in queues
-		for floor := 0; floor < config.N_Floors; floor++{
+		for floor := 0; floor < config.NFloors; floor++{
 
-			for button := 0; button < config.N_Buttons; button++{
+			for button := 0; button < config.NButtons; button++{
 
 				//If the two queues have different values(true-false,false-true)
 				if (e_local[elevid].OrderMatrix[floor][button]!=e_received[elevid].OrderMatrix[floor][button]){
@@ -74,13 +74,13 @@ func SynchronizeButtonLamps(elevatorsCh <-chan variabletypes.AllElevatorInfo,
     for {
         select {
             case elevators := <-elevatorsCh:
-                for floor := 0; floor < config.N_Floors; floor++{ // for all floors
-                    for btn := variabletypes.BT_HallUp; btn <= variabletypes.BT_Cab; btn++{ // and all buttons
+                for floor := 0; floor < config.NFloors; floor++{ // for all floors
+                    for btn := variabletypes.BTHallUp; btn <= variabletypes.BTCab; btn++{ // and all buttons
                         order := false
                         for _,id := range peers.Peers { // for all alive elevators
                             if (elevators[id].OrderMatrix[floor][btn]) { // if there is an order
                                	//order = true
-                                if (btn != variabletypes.BT_Cab)|| (id == config.ElevatorId ) { // if it's not a cabcall or it is your id
+                                if (btn != variabletypes.BTCab)|| (id == config.ElevatorId ) { // if it's not a cabcall or it is your id
                                     order = true
                                 }
                             }

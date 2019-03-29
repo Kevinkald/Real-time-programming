@@ -72,7 +72,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 
 
 			if chosenElevator == config.InvalidId {
-				fmt.Println("Error: invalid Id, order lost")
+				fmt.Println("Error: Invalid Id")
 			}
 
 
@@ -130,7 +130,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			//todo: make this nicer
 			var tmp = elevMap[config.ElevatorId]
 
-			for button := 0; button < config.N_Buttons; button++{
+			for button := 0; button < config.NButtons; button++{
 				tmp.OrderMatrix[r][button] = false
 				//elevio.SetButtonLamp(variabletypes.ButtonType(button), r, false)
 			}
@@ -167,9 +167,9 @@ func redistributeOrders( peers variabletypes.PeerUpdate,
 	redistMap := utilities.CreateMapCopy(elevMap)
 	var redistributedOrder variabletypes.ButtonEvent
 	for _,lostElevatorId := range peers.Lost {
-		for floor := 0; floor < config.N_Floors; floor++{
+		for floor := 0; floor < config.NFloors; floor++{
 			redistributedOrder.Floor = floor
-			for btn := variabletypes.BT_HallUp; btn <= variabletypes.BT_HallDown; btn++{
+			for btn := variabletypes.BTHallUp; btn <= variabletypes.BTHallDown; btn++{
 				redistributedOrder.Button = btn
 				if (elevMap[lostElevatorId].OrderMatrix[floor][btn]){
 					new_id := costfunction.DelegateOrder(elevMap, peers, redistributedOrder)

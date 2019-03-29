@@ -8,17 +8,17 @@ import(
 type MotorDirection int
 
 const (
-	MD_Up   MotorDirection = 1
-	MD_Down                = -1
-	MD_Stop                = 0
+	MDUp   MotorDirection = 1
+	MDDown                = -1
+	MDStop                = 0
 )
 
 type ButtonType int
 
 const (
-	BT_HallUp   ButtonType = 0
-	BT_HallDown            = 1
-	BT_Cab                 = 2
+	BTHallUp   ButtonType = 0
+	BTHallDown            = 1
+	BTCab                 = 2
 )
 
 type ElevatorState int
@@ -50,7 +50,7 @@ type ElevatorObject struct {
 	State ElevatorState
 }
 
-type SingleOrderMatrix [config.N_Floors][config.N_Buttons]bool
+type SingleOrderMatrix [config.NFloors][config.NButtons]bool
 
 type SingleElevatorInfo struct {
 	OrderMatrix SingleOrderMatrix

@@ -21,7 +21,7 @@ func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 	
 	
 	singleElevator.State = variabletypes.IDLE
-	singleElevator.Dirn = variabletypes.MD_Stop
+	singleElevator.Dirn = variabletypes.MDStop
 
 	elevatorStuckTimerResetCh := make(chan bool)
 	elevatorStuckTimerStopCh := make(chan bool)
@@ -71,7 +71,7 @@ func fsmNewOrder(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- 
 			singleElevator.State = variabletypes.OPEN
 		} else {
 			singleElevator.Dirn = orderlogic.ChooseNextDirection(singleElevator, singleElevatorOrders)
-			if singleElevator.Dirn != variabletypes.MD_Stop{							// BAD FIX!!!! Fix this with more clear communication
+			if singleElevator.Dirn != variabletypes.MDStop{							// BAD FIX!!!! Fix this with more clear communication
 				elevio.SetMotorDirection(singleElevator.Dirn)							// between modules
 				elevatorStuckTimerResetCh <- true
 				singleElevator.State = variabletypes.MOVING
@@ -87,10 +87,10 @@ func fsmReachedFloor(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh cha
 	switch singleElevator.State {
 	case variabletypes.MOVING:
 		if orderlogic.CheckForStop(singleElevator, singleElevatorOrders) {
-			elevio.SetMotorDirection(variabletypes.MD_Stop)
+			elevio.SetMotorDirection(variabletypes.MDStop)
 			elevio.SetDoorOpenLamp(true)
-			if (singleElevator.Floor == config.N_Floors - 1 || singleElevator.Floor == 0){
-				singleElevator.Dirn = variabletypes.MD_Stop
+			if (singleElevator.Floor == config.NFloors - 1 || singleElevator.Floor == 0){
+				singleElevator.Dirn = variabletypes.MDStop
 			}
 			doorTimerResetCh <- true
 			singleElevator.State = variabletypes.OPEN
@@ -104,14 +104,14 @@ func fsmDoorTimeOut(removeOrderCh chan<- int, elevatorStuckTimerResetCh chan<- b
 	switch singleElevator.State {
 	case variabletypes.OPEN:
 		fmt.Println("Closing doors")
-		for btn := 0; btn < config.N_Buttons; btn++{
+		for btn := 0; btn < config.NButtons; btn++{
 			singleElevatorOrders[singleElevator.Floor][btn] = false
 		}
 		removeOrderCh <- singleElevator.Floor
 		fmt.Println("Order removed")
 		elevio.SetDoorOpenLamp(false)
 		singleElevator.Dirn = orderlogic.ChooseNextDirection(singleElevator, singleElevatorOrders)
-		if singleElevator.Dirn == variabletypes.MD_Stop {
+		if singleElevator.Dirn == variabletypes.MDStop {
 			singleElevator.State = variabletypes.IDLE
 			fmt.Println("Elevator in IDLE")
 			elevatorStuckTimerStopCh <- true
@@ -126,7 +126,7 @@ func fsmDoorTimeOut(removeOrderCh chan<- int, elevatorStuckTimerResetCh chan<- b
 func fsmElevatorStuckTimeOut(){
 	fmt.Println("****************   ELEVATOR ENGINE ERROR!   ****************")
 	fmt.Println("****************   RESTART ELEVATOR %d      ****************", config.ElevatorId)
-	elevio.SetMotorDirection(variabletypes.MD_Stop)
+	elevio.SetMotorDirection(variabletypes.MDStop)
 	//time.Sleep(time.Second * 1)
 	(exec.Command("gnome-terminal", "-x", "sh", "-c", "go run main.go "+config.ElevatorId+" "+config.ElevatorPort)).Run()
 	os.Exit(1)

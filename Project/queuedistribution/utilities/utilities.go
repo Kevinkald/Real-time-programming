@@ -18,7 +18,7 @@ func CreateMapCopy(elevMap variabletypes.AllElevatorInfo) variabletypes.AllEleva
 
 func InitMap()variabletypes.AllElevatorInfo{
 	elevMap := make(map[string]variabletypes.SingleElevatorInfo)
-	for id := 1; id <= config.N_Elevators; id++{
+	for id := 1; id <= config.NElevators; id++{
 		id_string := strconv.Itoa(id)
 		elevMap[id_string] = variabletypes.SingleElevatorInfo{}
 	}
@@ -26,10 +26,10 @@ func InitMap()variabletypes.AllElevatorInfo{
 }
 
 func PrintMap(a variabletypes.AllElevatorInfo){
-		for id := 1; id <= config.N_Elevators; id++{
+		for id := 1; id <= config.NElevators; id++{
 			id_string := strconv.Itoa(id)
 			fmt.Println("Elevator id: ",id_string)
-			for floor := 0; floor < config.N_Floors; floor++{
+			for floor := 0; floor < config.NFloors; floor++{
 				fmt.Println(a[id_string].OrderMatrix[floor])
 			}
 			fmt.Println("State", a[id_string].ElevObj.State)
@@ -74,7 +74,7 @@ func Requests_clearAtCurrentFloor(e_old variabletypes.SingleElevatorInfo, button
     onCleared := false
 
     //for btn := 0; btn < config.N_Buttons; btn ++ {
-    for btn := variabletypes.BT_HallUp; btn <= variabletypes.BT_Cab; btn ++ {
+    for btn := variabletypes.BTHallUp; btn <= variabletypes.BTCab; btn ++ {
         if e.OrderMatrix[currentFloor][btn] == true {   // if there is an order 
             e.OrderMatrix[currentFloor][btn] = false;    // clear it
             fmt.Println("oncleared: ", onCleared)
