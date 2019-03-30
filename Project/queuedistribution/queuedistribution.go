@@ -100,7 +100,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		case n := <-networkMessageCh:
 
 			//fmt.Println(n)
-			elevMap = synchlogic.Synchronize(elevMap,n.Info)
+			elevMap = synchlogic.SynchronizeElevInfo(elevMap,n.Info)
 
 			//Broadcast changes and print
 			//msg.Info := utilities.CreateMapCopy(elevMap)
