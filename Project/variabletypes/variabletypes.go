@@ -16,9 +16,9 @@ const (
 type ButtonType int
 
 const (
-	BTHallUp   ButtonType = 0
-	BTHallDown            = 1
-	BTCab                 = 2
+	BTHallUp   ButtonType = iota
+	BTHallDown            
+	BTCab                 
 )
 
 type ElevatorState int
