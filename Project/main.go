@@ -1,23 +1,18 @@
 package main
 import(
-	//"fmt"
 	"runtime"
 	"./variabletypes"
-	//"time"
 	"./network"
 	"./config"
 	"./queuedistribution"
 	"./fsm/elevio"
-	//"./fsm/fsmdummy"
 	"./fsm"
 	"./queuedistribution/synchlogic"
 )
 
 func main(){
 	runtime.GOMAXPROCS(runtime.NumCPU())
-
 	config.ConfigInit()
-
 	elevio.Init("localhost:" + config.ElevatorPort)
 
 	//Channels between Queuedistributor and Network module
@@ -29,7 +24,6 @@ func main(){
 	ordersCh := make(chan variabletypes.SingleOrderMatrix,10)
 	elevatorObjectCh := make(chan variabletypes.ElevatorObject,10)
 	removeOrderCh := make(chan int,10)
-
 
 	//Channel between Buttons and Queuedistributor module
 	buttonsCh := make(chan variabletypes.ButtonEvent,10)
