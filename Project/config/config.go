@@ -6,7 +6,6 @@ import "time"
 var ElevatorPort string
 var ElevatorId string
 
-
 func ConfigInit(){
 	ElevatorId = os.Args[1]
 	ElevatorPort = os.Args[2]

@@ -7,8 +7,8 @@ import(
 
 func ordersAbove(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
 	for floor := elevator.Floor + 1; floor < config.NFloors; floor++ {
-		for btn := 0; btn < config.NButtons; btn++ {
-			if orders[floor][btn] {
+		for button := 0; button < config.NButtons; button++ {
+			if orders[floor][button] {
 				return true
 			}
 		}
@@ -18,8 +18,8 @@ func ordersAbove(elevator variabletypes.ElevatorObject, orders variabletypes.Sin
 
 func ordersBelow(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
 	for floor := 0; floor < elevator.Floor; floor++ {
-		for btn := 0; btn < config.NButtons; btn++ {
-			if orders[floor][btn] {
+		for button := 0; button < config.NButtons; button++ {
+			if orders[floor][button] {
 				return true
 			}
 		}
@@ -68,22 +68,3 @@ func CheckForStop(elevator variabletypes.ElevatorObject, orders variabletypes.Si
 	}
 	return false
 }
-
-
-/*
-func DelegateOrder(elevMap variabletypes.AllElevatorInfo, buttonEvent variabletypes.ButtonEvent) string {
-	AllElevMap := utilities.CreateMapCopy(elevMap)
-	currentIP := invalidIP
-	currentDuration := 0
-	for id, info := range AllElevMap {
-		// hvis heisen er i live
-		currentElevator = AllElevMap[i]
-		elevDuration = costfunction.timeToServeRequest(currentElevator, buttonEvent)
-		if elevDuration <= currentDuration {
-			currentDuration = elevDuration
-			currentIP = i
-		}
-	}
-	return currentIP
-}
-*/
