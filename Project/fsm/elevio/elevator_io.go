@@ -17,12 +17,9 @@ var _mtx sync.Mutex
 var _conn net.Conn
 
 func Init(addr string) {
-	///*, */
-	time.Sleep(time.Second * 3)
-	(exec.Command("gnome-terminal", "-x", "sh", "-c", "Simulator-v2/./SimElevatorServer --port "+config.ElevatorPort)).Run()
-	//(exec.Command("gnome-terminal", "-x", "sh", "-c", "ElevatorServer")).Run()
 	time.Sleep(time.Second * 2)
-
+	(exec.Command("gnome-terminal", "-x", "sh", "-c", "Simulator-v2/./SimElevatorServer --port "+config.ElevatorPort)).Run()
+	time.Sleep(time.Second * 2)
 
 	if _initialized {
 		fmt.Println("Driver already initialized!")
@@ -38,7 +35,7 @@ func Init(addr string) {
 		SetMotorDirection(variabletypes.MDDown)
 	}
 	for getFloor() == -1 {
-		// Wait until elevator reaches a floor
+		// Waits until elevator reaches a floor
 	}
 	SetMotorDirection(variabletypes.MDStop)
 	_initialized = true

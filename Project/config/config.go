@@ -13,10 +13,11 @@ func ConfigInit(){
 }
 
 const (
-	//Interval and timeout in ms
 	Interval = 15*time.Millisecond
 	Timeout = 1000*time.Millisecond
+	
 	InvalidId string = "0"
+
 	NFloors int = 4
 	NButtons int = 3
 	NElevators int = 3

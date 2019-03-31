@@ -5,28 +5,6 @@ import(
 	"../variabletypes"
 )
 
-func ordersAbove(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
-	for floor := elevator.Floor + 1; floor < config.NFloors; floor++ {
-		for button := 0; button < config.NButtons; button++ {
-			if orders[floor][button] {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func ordersBelow(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
-	for floor := 0; floor < elevator.Floor; floor++ {
-		for button := 0; button < config.NButtons; button++ {
-			if orders[floor][button] {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func ChooseNextDirection(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)variabletypes.MotorDirection{
 	switch elevator.Dirn {
 	case variabletypes.MDUp:
@@ -65,6 +43,28 @@ func CheckForStop(elevator variabletypes.ElevatorObject, orders variabletypes.Si
 		return (orders[elevator.Floor][0] || orders[elevator.Floor][2] || !ordersAbove(elevator, orders) || elevator.Floor == (config.NFloors - 1))
 	case variabletypes.MDStop:
 		return (orders[elevator.Floor][0] || orders[elevator.Floor][1] || orders[elevator.Floor][2])
+	}
+	return false
+}
+
+func ordersAbove(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
+	for floor := elevator.Floor + 1; floor < config.NFloors; floor++ {
+		for button := 0; button < config.NButtons; button++ {
+			if orders[floor][button] {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func ordersBelow(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
+	for floor := 0; floor < elevator.Floor; floor++ {
+		for button := 0; button < config.NButtons; button++ {
+			if orders[floor][button] {
+				return true
+			}
+		}
 	}
 	return false
 }
