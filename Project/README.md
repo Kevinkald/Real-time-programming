@@ -6,7 +6,7 @@ The program can be run by typing "go run main.go" followed by the ID and elevato
 
   `go run main.go 2 15657`
 
-If you are using the binary executable file and would like to start three elevator instances using the simulator write:
+If you are using the binary executable file and would like to start three elevator instances using the simulator, write the following in three separate terminal windows:
   
   `./main 1 16001`
   `./main 2 16002`
