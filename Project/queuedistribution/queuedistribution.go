@@ -6,118 +6,113 @@ import(
 	"../config"
 	"../variabletypes"
 	"./utilities"
-	//"../fsm/elevio"
 	"./synchlogic"
 	"./costfunction"
 )
 
 func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 							networkMessageCh <-chan variabletypes.NetworkMsg,
-							NetworkMessageBroadcastCh chan<-  variabletypes.NetworkMsg,
-							ButtonsCh <-chan variabletypes.ButtonEvent,
+							networkMessageBroadcastCh chan<-  variabletypes.NetworkMsg,
+							buttonsCh <-chan variabletypes.ButtonEvent,
 							removeOrderCh <-chan int,
 							ordersCh chan<- variabletypes.SingleOrderMatrix,
 		 					elevatorObjectCh <-chan variabletypes.ElevatorObject,
 		 					elevatorsCh chan<- variabletypes.AllElevatorInfo,
 		 					alivePeersCh chan<- variabletypes.PeerUpdate) {
 
-	elevMap := utilities.InitMap()
-
+	elevatorMap := utilities.InitMap()
 	ticker := time.NewTicker(time.Millisecond * 1000)
 	networkMessageTicker := time.NewTicker(time.Millisecond * 15)
 	orderChannelTicker := time.NewTicker(time.Millisecond * 100)
 
-
-	//Send initialized elevMap to broadcasting
-	//Important to copy the dynamic map before sending over channel
 	var msg variabletypes.NetworkMsg
-	var p variabletypes.PeerUpdate
+	var peers variabletypes.PeerUpdate
 
-	msg.Info = utilities.CreateMapCopy(elevMap)
+	msg.Info = utilities.CreateMapCopy(elevatorMap)
 	msg.Id = config.ElevatorId
 
-	NetworkMessageBroadcastCh<- msg
+	networkMessageBroadcastCh<- msg
 
 	for {
 		select{
-		case new_p := <-peerUpdateCh: 
-			received_p := new_p
-			if (len(received_p.Peers)!=len(p.Peers)){
-				redistributed_orders := redistributeOrders(received_p,elevMap)
-				elevMap = redistributed_orders
+		case p := <-peerUpdateCh: 
+			receivedPeers := p
+			if (len(receivedPeers.Peers)!=len(peers.Peers)){
+				redistributed_orders := redistributeOrders(receivedPeers,elevatorMap)
+				elevatorMap = redistributed_orders
 			}
-			p = received_p
-			alivePeersCh <- p
+			peers = receivedPeers
+			alivePeersCh <- peers
 
-		case b:= <-ButtonsCh:
-			// find best elevator to take order and set corresponding queue 
-			chosenElevator := costfunction.DelegateOrder(elevMap, p, b)
-
-			if chosenElevator == config.InvalidId {
+		case b:= <-buttonsCh:
+			chosenElevatorID := costfunction.DelegateOrder(elevatorMap, peers, b)
+			if chosenElevatorID == config.InvalidId {
 				fmt.Println("Error: Invalid Id")
 			}
-			var tmp = elevMap[chosenElevator]
-			tmp.OrderMatrix[b.Floor][b.Button] = true
-			elevMap[chosenElevator] = tmp
 
-			//Broadcast changes
-			msg.Info = utilities.CreateMapCopy(elevMap)
-			NetworkMessageBroadcastCh<- msg
+			var chosenElevator = elevatorMap[chosenElevatorID]
+			chosenElevator.OrderMatrix[b.Floor][b.Button] = true
+			elevatorMap[chosenElevatorID] = chosenElevator
+
+			msg.Info = utilities.CreateMapCopy(elevatorMap)
+			networkMessageBroadcastCh<- msg
 
 		case n := <-networkMessageCh:
-			elevMap = synchlogic.SynchronizeElevInfo(elevMap,n.Info)
+			elevatorMap = synchlogic.SynchronizeElevInfo(elevatorMap,n.Info)
 		
 		case r := <-removeOrderCh:
-			var tmp = elevMap[config.ElevatorId]
+			var elevator = elevatorMap[config.ElevatorId]
 
 			for button := 0; button < config.NButtons; button++{
-				tmp.OrderMatrix[r][button] = false
+				elevator.OrderMatrix[r][button] = false
 			}
-			elevMap[config.ElevatorId] = tmp
+			elevatorMap[config.ElevatorId] = elevator
 
-			msg.Info = utilities.CreateMapCopy(elevMap)
-			NetworkMessageBroadcastCh<- msg
+			msg.Info = utilities.CreateMapCopy(elevatorMap)
+			networkMessageBroadcastCh<- msg
 		
 		case q := <-elevatorObjectCh:
-			var tmp = elevMap[config.ElevatorId]
-			tmp.ElevObj = q
-			elevMap[config.ElevatorId] = tmp
+			var elevator = elevatorMap[config.ElevatorId]
+			elevator.ElevObj = q
+			elevatorMap[config.ElevatorId] = elevator
 
 		case <-ticker.C:
-			utilities.PrintMap(utilities.CreateMapCopy(elevMap))
+			utilities.PrintMap(utilities.CreateMapCopy(elevatorMap))
 
 		case <-networkMessageTicker.C:
-			msg.Info = utilities.CreateMapCopy(elevMap)
-			NetworkMessageBroadcastCh<- msg
+			msg.Info = utilities.CreateMapCopy(elevatorMap)
+			networkMessageBroadcastCh<- msg
 			time.Sleep(1*time.Millisecond)	
 
 		case <-orderChannelTicker.C:
-			if (elevMap[config.ElevatorId].ElevObj.State != variabletypes.OPEN){
-				ordersCh <- elevMap[config.ElevatorId].OrderMatrix
+			if (elevatorMap[config.ElevatorId].ElevObj.State != variabletypes.OPEN){
+				ordersCh <- elevatorMap[config.ElevatorId].OrderMatrix
 			}
-			elevators := utilities.CreateMapCopy(elevMap)
+			elevators := utilities.CreateMapCopy(elevatorMap)
 			elevatorsCh<- elevators
 		}
 	}
 }
 
 func redistributeOrders( peers variabletypes.PeerUpdate,
-						 elevMap variabletypes.AllElevatorInfo)variabletypes.AllElevatorInfo{
-	redistMap := utilities.CreateMapCopy(elevMap)
+						 elevatorMap variabletypes.AllElevatorInfo) variabletypes.AllElevatorInfo {
+	redistributedMap := utilities.CreateMapCopy(elevatorMap)
 	var redistributedOrder variabletypes.ButtonEvent
+
 	for _,lostElevatorId := range peers.Lost {
-		for floor := 0; floor < config.NFloors; floor++{
+		for floor := 0; floor < config.NFloors; floor++ {
 			redistributedOrder.Floor = floor
-			for btn := variabletypes.BTHallUp; btn <= variabletypes.BTHallDown; btn++{
-				redistributedOrder.Button = btn
-				if (elevMap[lostElevatorId].OrderMatrix[floor][btn]){
-					new_id := costfunction.DelegateOrder(elevMap, peers, redistributedOrder)
-					tmp := redistMap[new_id]
-					tmp.OrderMatrix[floor][btn] = true
-					redistMap[new_id] = tmp
+			for button := variabletypes.BTHallUp; button <= variabletypes.BTHallDown; button++{
+				redistributedOrder.Button = button
+				
+				if (elevatorMap[lostElevatorId].OrderMatrix[floor][button]){
+					new_id := costfunction.DelegateOrder(elevatorMap, peers, redistributedOrder)
+					elevator := redistributedMap[new_id]
+					elevator.OrderMatrix[floor][button] = true
+					redistributedMap[new_id] = elevator
 				}
 			}
 		}
 	}
-	return redistMap
+	return redistributedMap
 }

@@ -12,9 +12,7 @@ import(
 
 func main(){
 	runtime.GOMAXPROCS(runtime.NumCPU())
-
 	config.ConfigInit()
-
 	elevio.Init("localhost:" + config.ElevatorPort)
 
 	//Channels between Queuedistributor and Network module
@@ -26,7 +24,6 @@ func main(){
 	ordersCh := make(chan variabletypes.SingleOrderMatrix,10)
 	elevatorObjectCh := make(chan variabletypes.ElevatorObject,10)
 	removeOrderCh := make(chan int,10)
-
 
 	//Channels between Buttons and Queuedistributor module
 	buttonsCh := make(chan variabletypes.ButtonEvent,10)
