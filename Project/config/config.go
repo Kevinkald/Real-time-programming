@@ -1,7 +1,9 @@
 package config
-import "os"
-import "fmt"
-import "time"
+
+import (
+	"os"
+	"time"
+)
 
 var ElevatorPort string
 var ElevatorId string
@@ -9,7 +11,6 @@ var ElevatorId string
 func ConfigInit(){
 	ElevatorId = os.Args[1]
 	ElevatorPort = os.Args[2]
-	fmt.Println(ElevatorPort)
 }
 
 const (
@@ -24,4 +25,8 @@ const (
 
 	PeerPort int = 17563
 	BroadcastPort int = 17564
+
+	DoorOpenTime = 2*time.Second
+	StuckTime = 5*time.Second
+	PollRate = 20 * time.Millisecond
 )

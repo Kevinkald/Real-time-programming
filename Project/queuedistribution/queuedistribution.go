@@ -8,6 +8,7 @@ import(
 	"./utilities"
 	"./synchlogic"
 	"./costfunction"
+	"../orderlogic"
 )
 
 func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
@@ -37,7 +38,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		case p := <-peerUpdateCh: 
 			receivedPeers := p
 			if (len(receivedPeers.Peers)!=len(peers.Peers)){
-				redistributed_orders := redistributeOrders(receivedPeers,elevatorMap)
+				redistributed_orders := orderlogic.RedistributeOrders(receivedPeers,elevatorMap)
 				elevatorMap = redistributed_orders
 			}
 			peers = receivedPeers
@@ -49,9 +50,8 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 				fmt.Println("Error: Invalid Id")
 			}
 
-			var chosenElevator = elevatorMap[chosenElevatorID]
-			chosenElevator.OrderMatrix[b.Floor][b.Button] = true
-			elevatorMap[chosenElevatorID] = chosenElevator
+			elevatorMap[chosenElevatorID] = 
+			utilities.SetSingleElevatorMatrixValue(elevatorMap[chosenElevatorID], int(b.Floor), int(b.Button), true);
 
 			msg.Info = utilities.CreateMapCopy(elevatorMap)
 			networkMessageBroadcastCh<- msg
@@ -60,12 +60,10 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			elevatorMap = synchlogic.SynchronizeElevInfo(elevatorMap,n.Info)
 		
 		case r := <-removeOrderCh:
-			var elevator = elevatorMap[config.ElevatorId]
-
 			for button := 0; button < config.NButtons; button++{
-				elevator.OrderMatrix[r][button] = false
+				elevatorMap[config.ElevatorId] = 
+				utilities.SetSingleElevatorMatrixValue(elevatorMap[config.ElevatorId], r, button, false);
 			}
-			elevatorMap[config.ElevatorId] = elevator
 
 			msg.Info = utilities.CreateMapCopy(elevatorMap)
 			networkMessageBroadcastCh<- msg
@@ -78,7 +76,6 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		case <-networkMessageTicker.C:
 			msg.Info = utilities.CreateMapCopy(elevatorMap)
 			networkMessageBroadcastCh<- msg
-			time.Sleep(1*time.Millisecond)	
 
 		case <-orderChannelTicker.C:
 			if (elevatorMap[config.ElevatorId].ElevObj.State != variabletypes.OPEN){
@@ -90,7 +87,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 	}
 }
 
-func redistributeOrders( peers variabletypes.PeerUpdate,
+func RedistributeOrders( peers variabletypes.PeerUpdate,
 						 elevatorMap variabletypes.AllElevatorInfo) variabletypes.AllElevatorInfo {
 	
 	redistributedMap := utilities.CreateMapCopy(elevatorMap)
@@ -104,9 +101,8 @@ func redistributeOrders( peers variabletypes.PeerUpdate,
 				
 				if (elevatorMap[lostElevatorId].OrderMatrix[floor][button]){
 					new_id := costfunction.DelegateOrder(elevatorMap, peers, redistributedOrder)
-					elevator := redistributedMap[new_id]
-					elevator.OrderMatrix[floor][button] = true
-					redistributedMap[new_id] = elevator
+					redistributedMap[new_id] = 
+					utilities.SetSingleElevatorMatrixValue(redistributedMap[new_id], floor, int(button), true);
 				}
 			}
 		}

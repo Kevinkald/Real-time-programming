@@ -3,31 +3,30 @@ package fsm
 import(
 	"time"
 	"../config"
-	"../variabletypes"
 )
 
 func ElevatorStuckTimer(resetCh <-chan bool, stopCh <-chan bool, timerOutCh chan<- bool){
-	elevatorStuckTimer := time.NewTimer(5 * time.Second)
+	elevatorStuckTimer := time.NewTimer(config.StuckTime)
 	elevatorStuckTimer.Stop()
 	for {
 		select{
 		case <- stopCh:
 			elevatorStuckTimer.Stop()
 		case <- resetCh:
-			elevatorStuckTimer.Reset(5 * time.Second)
+			elevatorStuckTimer.Reset(config.StuckTime)
 		case <- elevatorStuckTimer.C:
 			timerOutCh <- true
 		}
 	}
 }
 
-func DoorTimer(tesetCh <-chan bool, timerOutCh chan<- bool){
-	doorTimer := time.NewTimer(config.DOOR_OPEN_TIME * time.Second)
+func DoorTimer(resetCh <-chan bool, timerOutCh chan<- bool){
+	doorTimer := time.NewTimer(config.DoorOpenTime)
 	doorTimer.Stop()
 	for{
 		select{
 		case <-resetCh:
-			doorTimer.Reset(config.DOOR_OPEN_TIME * time.Second)
+			doorTimer.Reset(config.DoorOpenTime)
 		case <-doorTimer.C:
 			timerOutCh <- true
 		}

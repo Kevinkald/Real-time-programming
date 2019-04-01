@@ -15,6 +15,12 @@ func CreateMapCopy(elevatorMap variabletypes.AllElevatorInfo) variabletypes.AllE
 	return copyMap
 }
 
+func SetSingleElevatorMatrixValue(	elevatorMap variabletypes.SingleElevatorInfo,
+									 floor int, button int, value bool)variabletypes.SingleElevatorInfo{
+	elevatorMap.OrderMatrix[floor][button] = value
+	return elevatorMap
+}
+
 func InitMap() variabletypes.AllElevatorInfo {
 	elevatorMap := make(map[string]variabletypes.SingleElevatorInfo)
 	for id := 1; id <= config.NElevators; id++ {
@@ -35,19 +41,4 @@ func PrintMap(elevatorMap variabletypes.AllElevatorInfo){
 			fmt.Println("Floor", elevatorMap[id_string].ElevObj.Floor)
 			fmt.Println("Dirn", elevatorMap[id_string].ElevObj.Dirn)
 		}
-}
-
-func Requests_clearAtCurrentFloor(elevator variabletypes.SingleElevatorInfo, buttonEvnt variabletypes.ButtonEvent) (bool, variabletypes.SingleElevatorInfo) {
-    var copy variabletypes.SingleElevatorInfo = elevator
-    onCleared := false
-
-    for button := variabletypes.BTHallUp; button <= variabletypes.BTCab; button ++ {
-        if copy.OrderMatrix[copy.ElevObj.Floor][button] == true {   
-            copy.OrderMatrix[copy.ElevObj.Floor][button] = false;  
-            if (buttonEvnt.Floor == copy.ElevObj.Floor) {
-            	onCleared = true
-            }
-        }
-    } 
-    return onCleared, copy;
 }

@@ -1,4 +1,5 @@
 package main
+
 import(
 	"runtime"
 	"./variabletypes"
@@ -34,7 +35,9 @@ func main(){
 
 	go network.Network(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh)
 
-	go queuedistribution.Queuedistribution(peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,buttonsCh,removeOrderCh,ordersCh,elevatorObjectCh,elevatorsCh,alivePeersCh)
+	go queuedistribution.Queuedistribution(	peerUpdateCh,networkMessageCh,networkMessageBroadcastCh,
+											buttonsCh,removeOrderCh,ordersCh,elevatorObjectCh,
+											elevatorsCh,alivePeersCh)
 
 	go synchlogic.SynchronizeButtonLamps(elevatorsCh,alivePeersCh)
 
