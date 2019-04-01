@@ -19,7 +19,7 @@ func Transmitter(port int, id string, transmitEnable <-chan bool) {
 	for {
 		select {
 		case enable = <-transmitEnable:
-		case <-time.After(config.Interval):
+		case <-time.After(config.PeerUpdateInterval):
 		}
 		if enable {
 			conn.WriteTo([]byte(id), addr)
@@ -38,7 +38,7 @@ func Receiver(port int, peerUpdateCh chan<- variabletypes.PeerUpdate) {
 	for {
 		updated := false
 
-		conn.SetReadDeadline(time.Now().Add(config.Interval))
+		conn.SetReadDeadline(time.Now().Add(config.PeerUpdateInterval))
 		n, _, _ := conn.ReadFrom(buf[0:])
 
 		id := string(buf[:n])
@@ -57,7 +57,7 @@ func Receiver(port int, peerUpdateCh chan<- variabletypes.PeerUpdate) {
 		// Removing dead connection
 		p.Lost = make([]string, 0)
 		for k, v := range lastSeen {
-			if time.Now().Sub(v) > config.Timeout {
+			if time.Now().Sub(v) > config.PeerTimeout {
 				updated = true
 				p.Lost = append(p.Lost, k)
 				delete(lastSeen, k)

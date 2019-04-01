@@ -1,8 +1,8 @@
 package orderlogic
 
 import(
-	"../config"
-	"../variabletypes"
+	"../../config"
+	"../../variabletypes"
 )
 
 func ChooseNextDirection(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)variabletypes.MotorDirection{

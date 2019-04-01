@@ -1,8 +1,8 @@
-package costfunction
-
+package orderassignment
 import (
     "../../variabletypes"
     "../../config"
+    "../utilities"
     "math"
 )
 
@@ -69,4 +69,27 @@ func calculateCost( elevator variabletypes.SingleElevatorInfo,
     }
 
     return cost
+}
+
+func RedistributeOrders( peers variabletypes.PeerUpdate,
+                         elevatorMap variabletypes.AllElevatorInfo) variabletypes.AllElevatorInfo {
+    
+    redistributedMap := utilities.CreateMapCopy(elevatorMap)
+    var redistributedOrder variabletypes.ButtonEvent
+
+    for _,lostElevatorId := range peers.Lost {
+        for floor := 0; floor < config.NFloors; floor++ {
+            redistributedOrder.Floor = floor
+            for button := variabletypes.BTHallUp; button <= variabletypes.BTHallDown; button++{
+                redistributedOrder.Button = button
+                
+                if (elevatorMap[lostElevatorId].OrderMatrix[floor][button]){
+                    new_id := DelegateOrder(elevatorMap, peers, redistributedOrder)
+                    redistributedMap[new_id] = 
+                    utilities.SetSingleElevatorMatrixValue(redistributedMap[new_id], floor, int(button), true);
+                }
+            }
+        }
+    }
+    return redistributedMap
 }

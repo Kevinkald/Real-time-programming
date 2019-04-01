@@ -4,7 +4,7 @@ import(
 	"fmt"
 	"./elevio"
 	"../config"
-	"../orderlogic"
+	"./orderlogic"
 	"../variabletypes"
 	"os"
 	"os/exec"

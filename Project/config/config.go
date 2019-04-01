@@ -14,8 +14,8 @@ func ConfigInit(){
 }
 
 const (
-	Interval = 15*time.Millisecond
-	Timeout = 1000*time.Millisecond
+	PeerUpdateInterval = 15*time.Millisecond
+	PeerTimeout = 1000*time.Millisecond
 	
 	InvalidId string = "0"
 
@@ -29,4 +29,7 @@ const (
 	DoorOpenTime = 2*time.Second
 	StuckTime = 5*time.Second
 	PollRate = 20*time.Millisecond
+
+	BroadcastInterval = time.Millisecond * 15
+	OrderUpdateInterval = time.Millisecond * 100
 )
