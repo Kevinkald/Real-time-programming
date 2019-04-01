@@ -1,6 +1,6 @@
-#Elevator project
+# Elevator project
 
-##Our solution
+## Our solution
 
 For this project we chose the programming language Go, which utilizes channels for communcation between modules. The concept was fairly easy to understand and also a very powerful tool for this task.
 
