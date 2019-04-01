@@ -1,5 +1,11 @@
 # Elevator project
 
+## How to run
+
+The program can be run by typing "go run main.go" followed by the ID and elevatorServer/simulator port for the elevator. For an elevator with ID = 2 and an ElevatorServer listening for commands at localhost:port 15657, write:
+
+  go run main.go 2 15657 
+
 ## Our solution
 
 For this project we chose the programming language Go, which utilizes channels for communcation between modules. The concept was fairly easy to understand and also a very powerful tool for this task.
@@ -12,7 +18,7 @@ When a button is pushed, the order is directly fed in to a delegation algorithm 
 
 When an elevator loses network connection, all elevators notice that theres an change in the number of elevators alive on the network. All hall orders are then redistributed among the elevators that the corresponding elevator sees as alive. Thus making sure that no orders are lost. When an elevator enters the network, the same procedure is applied as well as the elevator gets its cab calls back.
 
-If an elevator loses motor power, a timeout is given if the elvator is in a moving state but does not change floor for 5 seconds. After the timeout the code restarts and starts initializing procedure, which will not continue until power is restored.
+If an elevator loses motor power, a timeout is given if the elvator is in a moving state but does not change floor for 5 seconds. After the timeout the code restarts and starts an initializing procedure, which will not continue until power is restored.
 
 ## Modules
 
