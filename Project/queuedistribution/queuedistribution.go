@@ -36,8 +36,8 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		case p := <-peerUpdateCh: 
 			receivedPeers := p
 			if (len(receivedPeers.Peers)!=len(peers.Peers)){
-				redistributed_orders := orderassignment.RedistributeOrders(receivedPeers,elevatorMap)
-				elevatorMap = redistributed_orders
+				redistributedOrders := orderassignment.RedistributeOrders(receivedPeers,elevatorMap)
+				elevatorMap = redistributedOrders
 			}
 			peers = receivedPeers
 			alivePeersCh <- peers
