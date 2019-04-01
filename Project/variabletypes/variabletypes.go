@@ -2,7 +2,6 @@ package variabletypes
 
 import(
 	"../config"
-
 )
 
 type MotorDirection int

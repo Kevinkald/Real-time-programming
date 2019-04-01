@@ -28,24 +28,17 @@ func SynchronizeElevInfo(	localElevInfo variabletypes.AllElevatorInfo,
 				//If the setButtonLamp matrices have different values(true-false or false-true)
 				if ((localElevInfo[elevId].OrderMatrix[floor][button])!=
 					(receivedElevInfo[elevId].OrderMatrix[floor][button])){
-					//Set setButtonLamp to true(union)
-					var tmp = synchedElevInfo[elevId]
-					tmp.OrderMatrix[floor][button] = true
-					synchedElevInfo[elevId] = tmp 
-					//If the local elev info is the one not having an setButtonLamp
+					synchedElevInfo[elevId] = utilities.SetSingleElevatorMatrixValue(synchedElevInfo[elevId], floor,button, true);
+					//If the local elev info is the one not having the order
 					if (!localElevInfo[elevId].OrderMatrix[floor][button]){
 						if ((localElevInfo[elevId].ElevObj.State==variabletypes.OPEN)&&
 							(localElevInfo[elevId].ElevObj.Floor==floor)){
-							var tmp = synchedElevInfo[elevId]
-							tmp.OrderMatrix[floor][button] = false
-							synchedElevInfo[elevId] = tmp 
+							synchedElevInfo[elevId] = utilities.SetSingleElevatorMatrixValue(synchedElevInfo[elevId], floor,button, false);
 						}
-					//If the received elev info is the one not having an setButtonLamp
+					//If the received elev info is the one not having the order
 					} else if((receivedElevInfo[elevId].ElevObj.State==variabletypes.OPEN)&&
-							(receivedElevInfo[elevId].ElevObj.Floor==floor)){
-						var tmp = synchedElevInfo[elevId]
-						tmp.OrderMatrix[floor][button] = false
-						synchedElevInfo[elevId] = tmp 
+							(receivedElevInfo[elevId].ElevObj.Floor==floor)){ 
+						synchedElevInfo[elevId] = utilities.SetSingleElevatorMatrixValue(synchedElevInfo[elevId], floor,button, false);
 					}
 				}
 			}

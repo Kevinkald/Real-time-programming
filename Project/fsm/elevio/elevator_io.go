@@ -8,21 +8,16 @@ import(
 	"../../variabletypes"
 	"../../config"
 	"os/exec"
-) 
-
-const _pollRate = 20 * time.Millisecond
+)
 
 var _initialized bool = false
 var _mtx sync.Mutex
 var _conn net.Conn
 
 func Init(addr string) {
-	///*, */
-	time.Sleep(time.Second * 3)
-	(exec.Command("gnome-terminal", "-x", "sh", "-c", "Simulator-v2/./SimElevatorServer --port "+config.ElevatorPort)).Run()
-	//(exec.Command("gnome-terminal", "-x", "sh", "-c", "ElevatorServer")).Run()
 	time.Sleep(time.Second * 2)
-
+	(exec.Command("gnome-terminal", "-x", "sh", "-c", "Simulator-v2/./SimElevatorServer --port "+config.ElevatorPort)).Run()
+	time.Sleep(time.Second * 2)
 
 	if _initialized {
 		fmt.Println("Driver already initialized!")
@@ -38,7 +33,7 @@ func Init(addr string) {
 		SetMotorDirection(variabletypes.MDDown)
 	}
 	for getFloor() == -1 {
-		// Wait until elevator reaches a floor
+		// Waits until elevator reaches a floor
 	}
 	SetMotorDirection(variabletypes.MDStop)
 	_initialized = true
@@ -79,7 +74,7 @@ func SetStopLamp(value bool) {
 func PollButtons(receiver chan<- variabletypes.ButtonEvent) {
 	prev := make([][3]bool, config.NFloors)
 	for {
-		time.Sleep(_pollRate)
+		time.Sleep(config.PollRate)
 		for f := 0; f < config.NFloors; f++ {
 			for b := variabletypes.ButtonType(0); b < 3; b++ {
 				v := getButton(b, f)
@@ -95,7 +90,7 @@ func PollButtons(receiver chan<- variabletypes.ButtonEvent) {
 func PollFloorSensor(receiver chan<- int) {
 	prev := -1
 	for {
-		time.Sleep(_pollRate)
+		time.Sleep(config.PollRate)
 		v := getFloor()
 		if v != prev && v != -1 {
 			SetFloorIndicator(v)
@@ -108,7 +103,7 @@ func PollFloorSensor(receiver chan<- int) {
 func PollStopButton(receiver chan<- bool) {
 	prev := false
 	for {
-		time.Sleep(_pollRate)
+		time.Sleep(config.PollRate)
 		v := getStop()
 		if v != prev {
 			receiver <- v
@@ -120,7 +115,7 @@ func PollStopButton(receiver chan<- bool) {
 func PollObstructionSwitch(receiver chan<- bool) {
 	prev := false
 	for {
-		time.Sleep(_pollRate)
+		time.Sleep(config.PollRate)
 		v := getObstruction()
 		if v != prev {
 			receiver <- v

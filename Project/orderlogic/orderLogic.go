@@ -5,28 +5,6 @@ import(
 	"../variabletypes"
 )
 
-func ordersAbove(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
-	for floor := elevator.Floor + 1; floor < config.NFloors; floor++ {
-		for btn := 0; btn < config.NButtons; btn++ {
-			if orders[floor][btn] {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func ordersBelow(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
-	for floor := 0; floor < elevator.Floor; floor++ {
-		for btn := 0; btn < config.NButtons; btn++ {
-			if orders[floor][btn] {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func ChooseNextDirection(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)variabletypes.MotorDirection{
 	switch elevator.Dirn {
 	case variabletypes.MDUp:
@@ -57,33 +35,36 @@ func ChooseNextDirection(elevator variabletypes.ElevatorObject, orders variablet
 	return variabletypes.MDStop
 }
 
-func CheckForStop(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix) bool{
+func CheckForStop(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
 	switch elevator.Dirn {
 	case variabletypes.MDDown:
-		return (orders[elevator.Floor][1] || orders[elevator.Floor][2] || !ordersBelow(elevator, orders) || elevator.Floor == 0)
+		return (orders[elevator.Floor][variabletypes.BTHallDown] || orders[elevator.Floor][variabletypes.BTCab] || !ordersBelow(elevator, orders) || elevator.Floor == 0)
 	case variabletypes.MDUp:
-		return (orders[elevator.Floor][0] || orders[elevator.Floor][2] || !ordersAbove(elevator, orders) || elevator.Floor == (config.NFloors - 1))
+		return (orders[elevator.Floor][0] || orders[elevator.Floor][variabletypes.BTCab] || !ordersAbove(elevator, orders) || elevator.Floor == (config.NFloors - 1))
 	case variabletypes.MDStop:
-		return (orders[elevator.Floor][0] || orders[elevator.Floor][1] || orders[elevator.Floor][2])
+		return (orders[elevator.Floor][0] || orders[elevator.Floor][variabletypes.BTHallDown] || orders[elevator.Floor][variabletypes.BTCab])
 	}
 	return false
 }
 
-
-/*
-func DelegateOrder(elevMap variabletypes.AllElevatorInfo, buttonEvent variabletypes.ButtonEvent) string {
-	AllElevMap := utilities.CreateMapCopy(elevMap)
-	currentIP := invalidIP
-	currentDuration := 0
-	for id, info := range AllElevMap {
-		// hvis heisen er i live
-		currentElevator = AllElevMap[i]
-		elevDuration = costfunction.timeToServeRequest(currentElevator, buttonEvent)
-		if elevDuration <= currentDuration {
-			currentDuration = elevDuration
-			currentIP = i
+func ordersAbove(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
+	for floor := elevator.Floor + 1; floor < config.NFloors; floor++ {
+		for button := 0; button < config.NButtons; button++ {
+			if orders[floor][button] {
+				return true
+			}
 		}
 	}
-	return currentIP
+	return false
 }
-*/
+
+func ordersBelow(elevator variabletypes.ElevatorObject, orders variabletypes.SingleOrderMatrix)bool{
+	for floor := 0; floor < elevator.Floor; floor++ {
+		for button := 0; button < config.NButtons; button++ {
+			if orders[floor][button] {
+				return true
+			}
+		}
+	}
+	return false
+}

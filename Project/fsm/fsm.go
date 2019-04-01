@@ -2,7 +2,6 @@ package fsm
 
 import(
 	"fmt"
-	"time"
 	"./elevio"
 	"../config"
 	"../orderlogic"
@@ -11,17 +10,12 @@ import(
 	"os/exec"
 )
 
-
 var singleElevator variabletypes.ElevatorObject
 var singleElevatorOrders variabletypes.SingleOrderMatrix 
 
 func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 		 	elevatorObjectCh chan<- variabletypes.ElevatorObject,
 		 	removeOrderCh chan<- int) {
-	
-	
-	singleElevator.State = variabletypes.IDLE
-	singleElevator.Dirn = variabletypes.MDStop
 
 	elevatorStuckTimerResetCh := make(chan bool)
 	elevatorStuckTimerStopCh := make(chan bool)
@@ -32,11 +26,9 @@ func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 
 	reachedFloorCh := make(chan int)
 
-	go fsmElevatorStuckTimer(elevatorStuckTimerResetCh, elevatorStuckTimerStopCh, elevatorStuckTimerOutCh)
-	go fsmDoorTimer(doorTimerResetCh, doorTimerOutCh)
+	go ElevatorStuckTimer(elevatorStuckTimerResetCh, elevatorStuckTimerStopCh, elevatorStuckTimerOutCh)
+	go DoorTimer(doorTimerResetCh, doorTimerOutCh)
 	go elevio.PollFloorSensor(reachedFloorCh)
-
-	fmt.Println("Fsm goroutines up and running")
 
 	for {
 		select {
@@ -50,9 +42,7 @@ func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 		case msg1 := <-ordersCh:
 			singleElevatorOrders = msg1
 			fsmNewOrder(doorTimerResetCh, elevatorStuckTimerResetCh)
-			fmt.Println("received orders(FSM)")
 			elevatorObjectCh <- singleElevator
-			fmt.Println("sent ElevObj (FSM)")
 
 		case msg2 := <-reachedFloorCh:
 			singleElevator.Floor = msg2
@@ -71,13 +61,11 @@ func fsmNewOrder(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- 
 			singleElevator.State = variabletypes.OPEN
 		} else {
 			singleElevator.Dirn = orderlogic.ChooseNextDirection(singleElevator, singleElevatorOrders)
-			if singleElevator.Dirn != variabletypes.MDStop{							// BAD FIX!!!! Fix this with more clear communication
-				elevio.SetMotorDirection(singleElevator.Dirn)							// between modules
+			if singleElevator.Dirn != variabletypes.MDStop{
+				elevio.SetMotorDirection(singleElevator.Dirn)		
 				elevatorStuckTimerResetCh <- true
 				singleElevator.State = variabletypes.MOVING
-				fmt.Println("MOVING!!!!!!!!!!!!!!!!!!!!!!!!!")
 			}
-			
 		}
 	}
 }
@@ -103,18 +91,15 @@ func fsmReachedFloor(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh cha
 func fsmDoorTimeOut(removeOrderCh chan<- int, elevatorStuckTimerResetCh chan<- bool, elevatorStuckTimerStopCh chan<- bool){
 	switch singleElevator.State {
 	case variabletypes.OPEN:
-		fmt.Println("Closing doors")
-		for btn := 0; btn < config.NButtons; btn++{
-			singleElevatorOrders[singleElevator.Floor][btn] = false
+		for button := 0; button < config.NButtons; button++{
+			singleElevatorOrders[singleElevator.Floor][button] = false
 		}
 		removeOrderCh <- singleElevator.Floor
-		fmt.Println("Order removed")
 		elevio.SetDoorOpenLamp(false)
 		singleElevator.Dirn = orderlogic.ChooseNextDirection(singleElevator, singleElevatorOrders)
 		if singleElevator.Dirn == variabletypes.MDStop {
-			singleElevator.State = variabletypes.IDLE
-			fmt.Println("Elevator in IDLE")
 			elevatorStuckTimerStopCh <- true
+			singleElevator.State = variabletypes.IDLE
 		} else {
 			elevio.SetMotorDirection(singleElevator.Dirn)
 			elevatorStuckTimerResetCh <- true
@@ -124,40 +109,8 @@ func fsmDoorTimeOut(removeOrderCh chan<- int, elevatorStuckTimerResetCh chan<- b
 }
 
 func fsmElevatorStuckTimeOut(){
-	fmt.Println("****************   ELEVATOR ENGINE ERROR!   ****************")
-	fmt.Println("****************   RESTART ELEVATOR %d      ****************", config.ElevatorId)
+	fmt.Println("****************   ELEVATOR ENGINE ERROR. RESTARTING!   ****************")
 	elevio.SetMotorDirection(variabletypes.MDStop)
-	//time.Sleep(time.Second * 1)
 	(exec.Command("gnome-terminal", "-x", "sh", "-c", "go run main.go "+config.ElevatorId+" "+config.ElevatorPort)).Run()
 	os.Exit(1)
-}
-
-func fsmDoorTimer(doorTimerResetCh <-chan bool, doorTimerOutCh chan<- bool){
-	doorTimer := time.NewTimer(2 * time.Second)
-	doorTimer.Stop()
-	for{
-		select{
-		case <-doorTimerResetCh:
-			doorTimer.Stop()
-			doorTimer.Reset(2 * time.Second)
-		case <-doorTimer.C:
-			doorTimerOutCh <- true
-		}
-	}
-}
-
-func fsmElevatorStuckTimer(elevatorStuckTimerResetCh <-chan bool, elevatorStuckTimerStopCh <-chan bool, elevatorStuckTimerOutCh chan<- bool){
-	elevatorStuckTimer := time.NewTimer(5 * time.Second)
-	elevatorStuckTimer.Stop()
-	for {
-		select{
-		case <- elevatorStuckTimerStopCh:
-			elevatorStuckTimer.Stop()
-		case <- elevatorStuckTimerResetCh:
-			elevatorStuckTimer.Stop()
-			elevatorStuckTimer.Reset(5 * time.Second)
-		case <- elevatorStuckTimer.C:
-			elevatorStuckTimerOutCh <- true
-		}
-	}
 }
