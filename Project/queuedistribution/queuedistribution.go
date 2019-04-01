@@ -21,7 +21,6 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		 					alivePeersCh chan<- variabletypes.PeerUpdate) {
 
 	elevatorMap := utilities.InitMap()
-	ticker := time.NewTicker(time.Millisecond * 1000)
 	networkMessageTicker := time.NewTicker(time.Millisecond * 15)
 	orderChannelTicker := time.NewTicker(time.Millisecond * 100)
 
@@ -76,9 +75,6 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			elevator.ElevObj = q
 			elevatorMap[config.ElevatorId] = elevator
 
-		case <-ticker.C:
-			utilities.PrintMap(utilities.CreateMapCopy(elevatorMap))
-
 		case <-networkMessageTicker.C:
 			msg.Info = utilities.CreateMapCopy(elevatorMap)
 			networkMessageBroadcastCh<- msg
@@ -96,6 +92,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 
 func redistributeOrders( peers variabletypes.PeerUpdate,
 						 elevatorMap variabletypes.AllElevatorInfo) variabletypes.AllElevatorInfo {
+	
 	redistributedMap := utilities.CreateMapCopy(elevatorMap)
 	var redistributedOrder variabletypes.ButtonEvent
 
