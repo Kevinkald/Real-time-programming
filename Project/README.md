@@ -4,7 +4,7 @@
 
 The program can be run by typing "go run main.go" followed by the ID and elevatorServer/simulator port for the elevator. For an elevator with ID = 2 and an ElevatorServer listening for commands at localhost:port 15657, write:
 
-  go run main.go 2 15657 
+  'go run main.go 2 15657'
 
 ## Our solution
 
