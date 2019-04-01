@@ -12,7 +12,7 @@ When a button is pushed, the order is directly fed in to a delegation algorithm 
 
 When an elevator loses network connection, all elevators notice that theres an change in the number of elevators alive on the network. All hall orders are then redistributed among the elevators that the corresponding elevator sees as alive. Thus making sure that no orders are lost. When an elevator enters the network, the same procedure is applied as well as the elevator gets its cab calls back.
 
-If an elevator loses motor power, a timeout is given if the elvator is in a moving state but does not change floor for 5 seconds. After the timeout the code restarts and starts initializing procedure, which will not continue until power is restored.
+If an elevator loses motor power, a timeout is given if the elvator is in a moving state but does not change floor for 5 seconds. After the timeout the code restarts and starts initializing procedure, which will not continue until power is restored_.
 
 ## Modules
 
@@ -35,3 +35,7 @@ Peers on the local network can be detected by supplying your own ID to a transmi
 ### Elevator I/O
 
 The Elevator I/O module for this project was handed out and can be found [here](https://github.com/TTK4145/driver-go). The module acts as an interface between the elevator hardware and and our code, and is responsible for setting the motor direction, updating lights and polling buttons and floor sensors.
+
+### Simulator v2
+
+The Simulator module for this project was handed out and can be found [here](https://github.com/TTK4145/Simulator-v2). The module acts as a replacement for the physical elevator hardware.
