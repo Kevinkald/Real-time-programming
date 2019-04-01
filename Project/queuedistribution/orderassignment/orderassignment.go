@@ -21,7 +21,7 @@ func DelegateOrder( elevMap variabletypes.AllElevatorInfo,
         costs[peer] = calculateCost(elevMap[peer], buttonEvent)
     }
 
-    optimalElevator := config.InvalidId
+    optimalElevator := ""
     optimalElevatorCost := 9999
 
     for elevId, cost := range costs{
@@ -32,6 +32,29 @@ func DelegateOrder( elevMap variabletypes.AllElevatorInfo,
     }
 
     return optimalElevator
+}
+
+func RedistributeOrders( peers variabletypes.PeerUpdate,
+                         elevatorMap variabletypes.AllElevatorInfo) variabletypes.AllElevatorInfo {
+    
+    redistributedMap := utilities.CreateMapCopy(elevatorMap)
+    var redistributedOrder variabletypes.ButtonEvent
+
+    for _,lostElevatorId := range peers.Lost {
+        for floor := 0; floor < config.NFloors; floor++ {
+            redistributedOrder.Floor = floor
+            for button := variabletypes.BTHallUp; button <= variabletypes.BTHallDown; button++{
+                redistributedOrder.Button = button
+                
+                if (elevatorMap[lostElevatorId].OrderMatrix[floor][button]){
+                    newId := DelegateOrder(elevatorMap, peers, redistributedOrder)
+                    redistributedMap[newId] = 
+                    utilities.SetSingleElevatorMatrixValue(redistributedMap[newId], floor, int(button), true);
+                }
+            }
+        }
+    }
+    return redistributedMap
 }
 
 func calculateCost( elevator variabletypes.SingleElevatorInfo,
@@ -69,27 +92,4 @@ func calculateCost( elevator variabletypes.SingleElevatorInfo,
     }
 
     return cost
-}
-
-func RedistributeOrders( peers variabletypes.PeerUpdate,
-                         elevatorMap variabletypes.AllElevatorInfo) variabletypes.AllElevatorInfo {
-    
-    redistributedMap := utilities.CreateMapCopy(elevatorMap)
-    var redistributedOrder variabletypes.ButtonEvent
-
-    for _,lostElevatorId := range peers.Lost {
-        for floor := 0; floor < config.NFloors; floor++ {
-            redistributedOrder.Floor = floor
-            for button := variabletypes.BTHallUp; button <= variabletypes.BTHallDown; button++{
-                redistributedOrder.Button = button
-                
-                if (elevatorMap[lostElevatorId].OrderMatrix[floor][button]){
-                    new_id := DelegateOrder(elevatorMap, peers, redistributedOrder)
-                    redistributedMap[new_id] = 
-                    utilities.SetSingleElevatorMatrixValue(redistributedMap[new_id], floor, int(button), true);
-                }
-            }
-        }
-    }
-    return redistributedMap
 }

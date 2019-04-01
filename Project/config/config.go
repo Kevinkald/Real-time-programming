@@ -16,8 +16,6 @@ func ConfigInit(){
 const (
 	PeerUpdateInterval = 15*time.Millisecond
 	PeerTimeout = 1000*time.Millisecond
-	
-	InvalidId string = "0"
 
 	NFloors int = 4
 	NButtons int = 3

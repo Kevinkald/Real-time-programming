@@ -1,7 +1,6 @@
 package queuedistribution
 
 import(
-	"fmt"
 	"time"
 	"../config"
 	"../variabletypes"
@@ -12,7 +11,7 @@ import(
 
 func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 							networkMessageCh <-chan variabletypes.NetworkMsg,
-							networkMessageBroadcastCh chan<-  variabletypes.NetworkMsg,
+							networkMessageBroadcastCh chan<- variabletypes.NetworkMsg,
 							buttonsCh <-chan variabletypes.ButtonEvent,
 							removeOrderCh <-chan int,
 							ordersCh chan<- variabletypes.SingleOrderMatrix,
@@ -45,9 +44,6 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 
 		case b:= <-buttonsCh:
 			chosenElevatorID := orderassignment.DelegateOrder(elevatorMap, peers, b)
-			if chosenElevatorID == config.InvalidId {
-				fmt.Println("Error: Invalid Id")
-			}
 
 			elevatorMap[chosenElevatorID] = 
 			utilities.SetSingleElevatorMatrixValue(elevatorMap[chosenElevatorID], int(b.Floor), int(b.Button), true);
@@ -68,9 +64,9 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 			networkMessageBroadcastCh<- msg
 		
 		case q := <-elevatorObjectCh:
-			var elevator = elevatorMap[config.ElevatorId]
-			elevator.ElevObj = q
-			elevatorMap[config.ElevatorId] = elevator
+
+			elevatorMap[config.ElevatorId] = 
+				utilities.SetSingleElevatorObject(elevatorMap[config.ElevatorId],q)
 
 		case <-broadcastTicker.C:
 			msg.Info = utilities.CreateMapCopy(elevatorMap)

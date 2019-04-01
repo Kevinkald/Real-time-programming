@@ -16,29 +16,35 @@ func CreateMapCopy(elevatorMap variabletypes.AllElevatorInfo) variabletypes.AllE
 }
 
 func SetSingleElevatorMatrixValue(	elevatorMap variabletypes.SingleElevatorInfo,
-									 floor int, button int, value bool)variabletypes.SingleElevatorInfo{
+									floor int, button int, value bool)variabletypes.SingleElevatorInfo{
 	elevatorMap.OrderMatrix[floor][button] = value
 	return elevatorMap
+}
+
+func SetSingleElevatorObject(   elevatorMap variabletypes.SingleElevatorInfo,
+                                updatedObject variabletypes.ElevatorObject)variabletypes.SingleElevatorInfo{
+    elevatorMap.ElevObj = updatedObject
+    return elevatorMap
 }
 
 func InitMap() variabletypes.AllElevatorInfo {
 	elevatorMap := make(map[string]variabletypes.SingleElevatorInfo)
 	for id := 1; id <= config.NElevators; id++ {
-		id_string := strconv.Itoa(id)
-		elevatorMap[id_string] = variabletypes.SingleElevatorInfo{}
+		stringId := strconv.Itoa(id)
+		elevatorMap[stringId] = variabletypes.SingleElevatorInfo{}
 	}
 	return elevatorMap
 }
 
 func PrintMap(elevatorMap variabletypes.AllElevatorInfo){
 		for id := 1; id <= config.NElevators; id++{
-			id_string := strconv.Itoa(id)
-			fmt.Println("Elevator id: ",id_string)
+			stringId := strconv.Itoa(id)
+			fmt.Println("Elevator id: ",stringId)
 			for floor := 0; floor < config.NFloors; floor++{
-				fmt.Println(elevatorMap[id_string].OrderMatrix[floor])
+				fmt.Println(elevatorMap[stringId].OrderMatrix[floor])
 			}
-			fmt.Println("State", elevatorMap[id_string].ElevObj.State)
-			fmt.Println("Floor", elevatorMap[id_string].ElevObj.Floor)
-			fmt.Println("Dirn", elevatorMap[id_string].ElevObj.Dirn)
+			fmt.Println("State", elevatorMap[stringId].ElevObj.State)
+			fmt.Println("Floor", elevatorMap[stringId].ElevObj.Floor)
+			fmt.Println("Dirn", elevatorMap[stringId].ElevObj.Dirn)
 		}
 }

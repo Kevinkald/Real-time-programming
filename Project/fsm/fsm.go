@@ -52,7 +52,8 @@ func Fsm(	ordersCh <-chan variabletypes.SingleOrderMatrix,
 	}
 }
 
-func fsmNewOrder(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- bool) {
+func fsmNewOrder(	doorTimerResetCh chan<- bool,
+				 	elevatorStuckTimerResetCh chan<- bool) {
 	switch singleElevator.State {
 	case variabletypes.IDLE:
 		if orderlogic.CheckForStop(singleElevator, singleElevatorOrders) {
@@ -70,7 +71,9 @@ func fsmNewOrder(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- 
 	}
 }
 
-func fsmReachedFloor(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh chan<- bool, elevatorStuckTimerStopCh chan<- bool){
+func fsmReachedFloor(	doorTimerResetCh chan<- bool,
+						elevatorStuckTimerResetCh chan<- bool,
+						elevatorStuckTimerStopCh chan<- bool){
 	elevatorStuckTimerStopCh <- true
 	switch singleElevator.State {
 	case variabletypes.MOVING:
@@ -88,7 +91,9 @@ func fsmReachedFloor(doorTimerResetCh chan<- bool, elevatorStuckTimerResetCh cha
 	}
 }
 
-func fsmDoorTimeOut(removeOrderCh chan<- int, elevatorStuckTimerResetCh chan<- bool, elevatorStuckTimerStopCh chan<- bool){
+func fsmDoorTimeOut(	removeOrderCh chan<- int,
+						elevatorStuckTimerResetCh chan<- bool,
+						elevatorStuckTimerStopCh chan<- bool){
 	switch singleElevator.State {
 	case variabletypes.OPEN:
 		for button := 0; button < config.NButtons; button++{

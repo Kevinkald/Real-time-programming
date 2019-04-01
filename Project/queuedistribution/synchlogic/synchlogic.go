@@ -17,9 +17,8 @@ func SynchronizeElevInfo(	localElevInfo variabletypes.AllElevatorInfo,
 
 		// Synchronize elevator objects
 		if (elevId != config.ElevatorId){
-			var tmp = synchedElevInfo[elevId]
-			tmp.ElevObj = receivedElevInfo[elevId].ElevObj
-			synchedElevInfo[elevId] = tmp
+			synchedElevInfo[elevId] = 
+				utilities.SetSingleElevatorObject(synchedElevInfo[elevId],receivedElevInfo[elevId].ElevObj)
 		}
 
 		// Synchronize orders
@@ -47,8 +46,8 @@ func SynchronizeElevInfo(	localElevInfo variabletypes.AllElevatorInfo,
 	return synchedElevInfo
 }
 
-func SynchronizeButtonLamps(elevatorsCh <-chan variabletypes.AllElevatorInfo,
-							alivePeersCh <-chan variabletypes.PeerUpdate){
+func SynchronizeButtonLamps(	elevatorsCh <-chan variabletypes.AllElevatorInfo,
+								alivePeersCh <-chan variabletypes.PeerUpdate){
 
     var peers variabletypes.PeerUpdate
     var elevators variabletypes.AllElevatorInfo
@@ -60,11 +59,11 @@ func SynchronizeButtonLamps(elevatorsCh <-chan variabletypes.AllElevatorInfo,
             	elevators = e
             case <-ticker.C:
                 for floor := 0; floor < config.NFloors; floor++{
-                    for button := variabletypes.BTHallUp; button <= variabletypes.BTCab; button++{
+                    for button := 0; button < config.NButtons; button++{
                         setButtonLamp := false
                         for _,id := range peers.Peers {
                             if (elevators[id].OrderMatrix[floor][button]) {
-                                if (button != variabletypes.BTCab)||(id == config.ElevatorId ) {
+                                if (button != int(variabletypes.BTCab))||(id == config.ElevatorId ) {
                                     setButtonLamp = true
                                 }
                             }
