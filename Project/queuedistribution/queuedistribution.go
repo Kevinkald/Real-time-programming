@@ -8,7 +8,6 @@ import(
 	"./utilities"
 	"./synchlogic"
 	"./costfunction"
-	"../orderlogic"
 )
 
 func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
@@ -38,7 +37,7 @@ func Queuedistribution(		peerUpdateCh <-chan variabletypes.PeerUpdate,
 		case p := <-peerUpdateCh: 
 			receivedPeers := p
 			if (len(receivedPeers.Peers)!=len(peers.Peers)){
-				redistributed_orders := orderlogic.RedistributeOrders(receivedPeers,elevatorMap)
+				redistributed_orders := RedistributeOrders(receivedPeers,elevatorMap)
 				elevatorMap = redistributed_orders
 			}
 			peers = receivedPeers

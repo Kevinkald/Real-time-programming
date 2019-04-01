@@ -28,5 +28,5 @@ const (
 
 	DoorOpenTime = 2*time.Second
 	StuckTime = 5*time.Second
-	PollRate = 20 * time.Millisecond
+	PollRate = 20*time.Millisecond
 )
