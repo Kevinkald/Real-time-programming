@@ -6,6 +6,12 @@ The program can be run by typing "go run main.go" followed by the ID and elevato
 
   `go run main.go 2 15657`
 
+If you are using the binary executable file and would like to start three elevator instances using the simulator write:
+  
+  `./main 1 16001`
+  `./main 2 16002`
+  `./main 3 16003`
+  
 ## Our solution
 
 For this project we chose the programming language Go, which utilizes channels for communcation between modules. The concept was fairly easy to understand and also a very powerful tool for this task.
